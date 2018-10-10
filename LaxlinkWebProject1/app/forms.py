@@ -16,3 +16,10 @@ class BootstrapAuthenticationForm(AuthenticationForm):
                                widget=forms.PasswordInput({
                                    'class': 'form-control',
                                    'placeholder':'Password'}))
+class TeamInfoForm(forms.Form):
+    name=forms.CharField(label='Team-Name')
+    state = forms.ChoiceField(label='State', choices=(('TX','Texas'), ('OK','Oklahoma'), ('LA','Louisiana'), ('Other','Other')))
+    region = forms.ChoiceField(label='Region', choices=(('NorthRegion','North'), ('SouthRegion','South'),('CentralRegion', 'Central')))
+    division = forms.ChoiceField(label='Division', choices=(('D1','D1'), ('D2','D2'), ('JV','JV')))
+    headCoach = forms.CharField(label= 'Head Coach')
+    s1 = forms.ChoiceField(choices = (('1','1'), ('two','2')))
