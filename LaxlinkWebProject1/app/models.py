@@ -55,14 +55,17 @@ class TeamData(models.Model):
 
     def __str__(self):
         return self.state + "-" + self.conference+ "-" + self.division + "-" + self.name 
+    
+    def getName(self):
+        return self.name
 
 class GameInfo(models.Model): 
     #TODO: Add field for the individuals who validated score 2-3 mapping to a USER
     #home_team = models.ManyToManyField(TeamData, related_name="home_team")
-    home_team = models.ForeignKey(TeamData, default='0', related_name="home_team")
+    Home_team = models.ForeignKey(TeamData, default='0', related_name="home_team")
     home_score = models.IntegerField(default=0)
     #away_team = models.ManyToManyField(TeamData, related_name="away_team")
-    away_team = models.ForeignKey(TeamData, default="0", related_name="away_team")
+    Away_team = models.ForeignKey(TeamData, default="0", related_name="away_team")
     away_score = models.IntegerField(default=0)
     date = models.DateField(default=datetime_safe.date.today)
     location = models.CharField(max_length = 100, default="Home Team Field")

@@ -3,14 +3,43 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>{{ games.hometeamname }}</title>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+}
+th {
+    text-align: left;
+}
+</style>
 </head>
 <body>
     <div class="col-md-4">
-        <h2>WEbPage1</h2>
-        <p>
-            Scratch webpage
-        </p>
+        <h2> {{ teamName }} </h2>
+        <table style="width:100%">
+            <tr>
+                <th bgcolor="#c9d8f2">Away Team</th>
+                <th bgcolor="#c9d8f2">Away Score</th>
+                <th bgcolor="#c9d8f2">Home Team</th>
+                <th bgcolor="#c9d8f2">Home Score</th>
+                <th bgcolor="#c9d8f2">Date</th>
+                <th bgcolor="#c9d8f2">Score Verified</th>
+            </tr>
+            {% for game in games %}
+                <tr>
+                    <td> {{ game.awayteamname }} </td>
+                    <td> {{ game.awayscore }} </td>
+                    <td> {{ game.hometeamname }} </td>
+                    <td> {{ game.homescore }} </td>
+                    <td> {{ game.gamedate }} </td>
+                    <td> {{ game.verified }} </td>
+                </tr>
+            {% endfor %}
+        </table>
         <p><a class="btn btn-default" href="http://www.djangobook.com/en/2.0/index.html">Learn more &raquo;</a></p>
     </div>
 </body>
