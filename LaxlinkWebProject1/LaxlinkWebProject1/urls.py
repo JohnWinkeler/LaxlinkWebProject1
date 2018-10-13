@@ -15,6 +15,8 @@ from django.conf.urls import include
 from django.contrib import admin
 admin.autodiscover()
 admin.site.register(app.models.Snippet)
+admin.site.register(app.models.TeamData)
+admin.site.register(app.models.GameInfo)
 
 urlpatterns = [
     # Examples:
@@ -23,6 +25,7 @@ urlpatterns = [
     url(r'^about$', app.views.about, name='about'),
     url(r'WebPage1$', app.views.WebPage1, name='WebPage1'),
     url(r'snippet$', app.views.snippet_detail, name='snippet_detail'),
+    url(r'teamsn$', app.views.teamSnippet_detail, name='teamSnippet_detail'),
     url(r'createteaminfo', app.views.createteaminfo, name='createteaminfo'),
     url(r'^login/$',
         django.contrib.auth.views.login,

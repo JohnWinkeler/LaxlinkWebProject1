@@ -3,9 +3,12 @@ Definition of forms.
 """
 
 from django import forms
-from app.models import Snippet
+from app.models import Snippet, TeamData
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit
+
 
 class BootstrapAuthenticationForm(AuthenticationForm):
     """Authentication form which uses boostrap CSS."""
@@ -17,16 +20,29 @@ class BootstrapAuthenticationForm(AuthenticationForm):
                                widget=forms.PasswordInput({
                                    'class': 'form-control',
                                    'placeholder':'Password'}))
-class TeamInfoForm(forms.Form):
-    name = forms.CharField(label='Team-Name')
-    state = forms.ChoiceField(label='State', choices=(('TX','Texas'), ('OK','Oklahoma'), ('LA','Louisiana'), ('Other','Other')))
-    region = forms.ChoiceField(label='Region', choices=(('NorthRegion','North'), ('SouthRegion','South'),('CentralRegion', 'Central')))
-    division = forms.ChoiceField(label='Division', choices=(('D1','D1'), ('D2','D2'), ('JV','JV')))
-    headCoach = forms.CharField(label= 'Head Coach')
-    s1 = forms.ChoiceField(choices = (('1','1'), ('two','2')))
+class CreateTeamInfoForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+
+        self.helper.add_input(Submit('submit', 'Submit'))
+        super(CreateTeamInfoForm, self).__init__(*args, **kwargs)
+
+
+    class Meta:
+        model = TeamData
+        fields = ('name', 'coach', 'contact_name', 'coach_email', 'state', 'conference', 'division')
+
+
 
 class SnippetForm(forms.ModelForm):
 
     class Meta:
         model = Snippet
         fields = ('name','body')
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = TeamData
+        fields = ('name','coach')
+

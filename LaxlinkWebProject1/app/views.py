@@ -3,10 +3,10 @@ Definition of views.
 """
 
 from django.shortcuts import render
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from datetime import datetime
-from app.forms import TeamInfoForm, SnippetForm
+from app.forms import CreateTeamInfoForm, SnippetForm, TeamForm
 
 def home(request):
     """Renders the home page."""
@@ -59,19 +59,20 @@ def WebPage1(request):
         }
     )
 def createteaminfo(request):
-    'Renders the create TeamInfo page'
+    'Renders the createTeamInfo page, stores user provided data in db'
    
     if request.method == 'POST':
-        #createing a new form
-        teamform = TeamInfoForm(request.POST)
+        #creating a new form
+        teamform = CreateTeamInfoForm(request.POST)
         if teamform.is_valid():
             name = teamform.cleaned_data['name']
-
             print(name)
+            teamform.save()
+            
 
-    teamform = TeamInfoForm()
+    teamform = CreateTeamInfoForm()
     return render( request, 
-                  'app/teaminfo.html', 
+                  'app/createteaminfo.html', 
                   {
                       'title': 'TeamInfo',
                       'form' : teamform})
@@ -81,13 +82,33 @@ def snippet_detail(request):
         #creating a new form
         teamform = SnippetForm(request.POST)
         if teamform.is_valid():
-            teamform.save()
-          
+            #teamform.save()
+             print('VALID')
 
     teamform = SnippetForm()
     return render( request, 
-                  'app/teaminfo.html', 
+                  'app/createteaminfo.html', 
                   {
                       'title': 'TeamInfo',
                       'form' : teamform
                   })
+
+def teamSnippet_detail(request):
+    if request.method == 'POST':
+        #creating a new form
+        tempForm=TeamForm(request.POST)
+        if tempForm.is_valid():
+            tempForm.save()
+            
+
+    tempForm=TeamForm()
+    return render (request,
+                   'app/createteaminfo.html',
+                   {
+                        'title': 'TeamInfo',
+                        'form' : tempForm
+                       })
+    
+#def teamschedule(response):
+#    return render(response.
+#                  'app/teamschedule.html')
