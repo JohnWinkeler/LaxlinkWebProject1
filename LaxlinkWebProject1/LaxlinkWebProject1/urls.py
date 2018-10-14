@@ -17,6 +17,7 @@ admin.autodiscover()
 admin.site.register(app.models.Snippet)
 admin.site.register(app.models.TeamData)
 admin.site.register(app.models.GameInfo)
+admin.site.register(app.models.WinLossRecord)
 
 urlpatterns = [
     # Examples:
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'snippet$', app.views.snippet_detail, name='snippet_detail'),
     url(r'teamsn$', app.views.teamSnippet_detail, name='teamSnippet_detail'),
     url(r'createteaminfo', app.views.createteaminfo, name='createteaminfo'),
+    url(r'gameschedule', app.views.gameschedule, name='gameschedule'),
     url(r'^login/$',
         django.contrib.auth.views.login,
         {

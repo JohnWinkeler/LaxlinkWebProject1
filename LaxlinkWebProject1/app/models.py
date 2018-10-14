@@ -36,6 +36,17 @@ CONFERENCE = (
     ('TGHSLL-S', 'Texas (TGHSLL) South Conference'),
 )
 
+SEASON = (
+    ('FALL','Fall'),
+    ('SPRING', 'Spring'),
+    ('SUMMER', 'Summer'),
+    ('WINTER', 'Winter'),
+    ('INDOOR', 'Indoor'),
+    ('TRAVEL', 'Travel'),
+    ('NONE', 'None'),
+)
+
+
 class Snippet(models.Model):
     name = models.CharField(max_length=100)
     body = models.CharField(max_length=100)
@@ -52,6 +63,7 @@ class TeamData(models.Model):
     state =  models.CharField(max_length=2, choices=STATES)
     conference = models.CharField(max_length=8, choices=CONFERENCE, default="NONE")
     division = models.CharField(max_length=6, choices=DIVISIONS)
+    powerrating = models.IntegerField(default=0)
 
     def __str__(self):
         return self.state + "-" + self.conference+ "-" + self.division + "-" + self.name 
@@ -59,19 +71,38 @@ class TeamData(models.Model):
     def getName(self):
         return self.name
 
+class WinLossRecord(models.Model):
+    season = models.CharField(max_length=10, choices=SEASON, default="None")
+    wincount = models.IntegerField(default=0)
+    losscount = models.IntegerField(default=0)
+    year = models.IntegerField(default=0)
+    teamkey =  models.ForeignKey(TeamData, default='0', related_name="team")
+
+    def __str__(self):
+        return str(self.id)
+
 class GameInfo(models.Model): 
     #TODO: Add field for the individuals who validated score 2-3 mapping to a USER
-    #home_team = models.ManyToManyField(TeamData, related_name="home_team")
+
+    #Teams involved
     Home_team = models.ForeignKey(TeamData, default='0', related_name="home_team")
-    home_score = models.IntegerField(default=0)
-    #away_team = models.ManyToManyField(TeamData, related_name="away_team")
     Away_team = models.ForeignKey(TeamData, default="0", related_name="away_team")
+
+    #Score - Updated  by users
+    home_score = models.IntegerField(default=0)
     away_score = models.IntegerField(default=0)
+
+
+    #Data about each game - values stored at creation time to build a schedule
     date = models.DateField(default=datetime_safe.date.today)
     location = models.CharField(max_length = 100, default="Home Team Field")
     game_type = models.CharField(max_length=1, choices=GAMETYPES)
     game_validated = models.BooleanField(default=False)
-    #key to attach to TeamSomehow
+
+    #Link to seasonal record, may reduce the traversal of table to generate stats
+    winlosslink_winner =  models.ForeignKey(WinLossRecord, default='0', related_name='winners_record')
+    winlosslink_loser = models.ForeignKey(WinLossRecord, default='0', related_name='loserss_record')
+
     def __str__(self):
     #    return self.away_team.__str__ + "at" + self.home_team.__str__
         return str(self.id)

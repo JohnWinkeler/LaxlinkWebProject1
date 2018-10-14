@@ -145,7 +145,18 @@ def teamSnippet_detail(request):
                         'title': 'TeamInfo',
                         'form' : tempForm
                        })
-    
+def gameschedule(request):
+    """Renders the home page."""
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/gameschedule.html',
+        {
+            'title':'Game Schedule',
+            'year':datetime.now().year,
+        }
+    )
+
 #def teamschedule(response):
 #    return render(response.
 #                  'app/teamschedule.html')

@@ -59,6 +59,7 @@
     <Content Include="app\templates\app\WebPage1.html" />
     <Content Include="app\templates\app\createteaminfo.html" />
     <Content Include="app\templates\app\GamesPage.html" />
+    <Content Include="app\templates\app\gameschedule.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />
