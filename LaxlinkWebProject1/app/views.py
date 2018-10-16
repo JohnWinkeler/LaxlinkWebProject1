@@ -2,12 +2,13 @@
 Definition of views.
 """
 
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from datetime import datetime
-from app.forms import CreateTeamInfoForm, SnippetForm, TeamForm
+from app.forms import CreateTeamInfoForm, SnippetForm, TeamForm, RegistrationForm
 from app.models import *
+from django.contrib.auth.forms import UserCreationForm
 
 def home(request):
     """Renders the home page."""
@@ -92,7 +93,7 @@ def WebPage1(request):
         gamedatalist.append(tempGameRecord)
 
 
-    return render_to_response('app/WebPage1.html', {'teamname': 'PlaceHolder', 'games':gamedatalist})
+    return render_to_response('app/WebPage1.html', {'teamname': 'PlaceHolder', 'schedule': 'YES','games':gamedatalist})
 
 
 def createteaminfo(request):
@@ -160,3 +161,23 @@ def gameschedule(request):
 #def teamschedule(response):
 #    return render(response.
 #                  'app/teamschedule.html')
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('app/accounts/thankyouregister.html')
+        else:
+            return redirect('app/accounts/failregister.html')
+    else:
+        form = RegistrationForm()
+
+        args = {'form':form}
+        return render(request, 'app/accounts/reg_form.html', args)
+
+def thankyouregister(request):
+    return render(request, 'app/accounts/thankyouregister.html')
+
+def failregistration(request):
+    return render(request, 'app/accounts/failregister.html')

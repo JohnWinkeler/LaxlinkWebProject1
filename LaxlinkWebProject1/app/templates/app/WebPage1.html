@@ -21,27 +21,47 @@ th {
 </head>
 <body>
     <div class="col-md-4">
-        <h2> {{ teamName }} </h2>
-        <table style="width:100%">
-            <tr>
-                <th bgcolor="#c9d8f2">Away Team</th>
-                <th bgcolor="#c9d8f2">Away Score</th>
-                <th bgcolor="#c9d8f2">Home Team</th>
-                <th bgcolor="#c9d8f2">Home Score</th>
-                <th bgcolor="#c9d8f2">Date</th>
-                <th bgcolor="#c9d8f2">Score Verified</th>
-            </tr>
-            {% for game in games %}
+        {% if display_record %}
+            <table style="width:100%">
                 <tr>
-                    <td> {{ game.awayteamname }} </td>
-                    <td> {{ game.awayscore }} </td>
-                    <td> {{ game.hometeamname }} </td>
-                    <td> {{ game.homescore }} </td>
-                    <td> {{ game.gamedate }} </td>
-                    <td> {{ game.verified }} </td>
+                    <th bgcolor="#c9d8f2">Away Team</th>
+                    <th bgcolor="#c9d8f2">Away Score</th>
+                    <th bgcolor="#c9d8f2">Home Team</th>
+                    <th bgcolor="#c9d8f2">Home Score</th>
+                    <th bgcolor="#c9d8f2">Date</th>
+                    <th bgcolor="#c9d8f2">Score Verified</th>
                 </tr>
-            {% endfor %}
-        </table>
+                {% for game in games %}
+                    <tr>
+                        <td> {{ game.awayteamname }} </td>
+                        <td> {{ game.awayscore }} </td>
+                        <td> {{ game.hometeamname }} </td>
+                        <td> {{ game.homescore }} </td>
+                        <td> {{ game.gamedate }} </td>
+                        <td> {{ game.verified }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+        {% if schedule %}
+            <table style="width:100%">
+                <tr>
+                    <th bgcolor="#c9d8f2">Away Team</th>
+                    <th bgcolor="#c9d8f2">Home Team</th>
+                    <th bgcolor="#c9d8f2">Date</th>
+                </tr>
+                {% for game in games %}
+                    <tr>
+                        <td> {{ game.awayteamname }} </td>
+                        <td> {{ game.hometeamname }} </td>
+                        <td> {{ game.gamedate }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+       
+
         <p><a class="btn btn-default" href="http://www.djangobook.com/en/2.0/index.html">Learn more &raquo;</a></p>
     </div>
 </body>

@@ -29,6 +29,10 @@ urlpatterns = [
     url(r'teamsn$', app.views.teamSnippet_detail, name='teamSnippet_detail'),
     url(r'createteaminfo', app.views.createteaminfo, name='createteaminfo'),
     url(r'gameschedule', app.views.gameschedule, name='gameschedule'),
+    url(r'reg_form', app.views.register, name='reg_form'),
+    url('thankyouregister',app.views.thankyouregister),
+    url('failregister',app.views.failregistration),
+      
     url(r'^login/$',
         django.contrib.auth.views.login,
         {

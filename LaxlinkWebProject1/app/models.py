@@ -4,6 +4,7 @@ Definition of models.
 
 from django.db import models
 from django.utils import datetime_safe
+from django.contrib.auth.forms import UserCreationForm
 
 
 GAMETYPES = (
@@ -81,6 +82,15 @@ class WinLossRecord(models.Model):
     def __str__(self):
         return str(self.id)
 
+#class User(models.Model):
+#   user_name: models.CharField(max_length = 20)
+#    is_score_keeper = models.BooleanField(default=False)
+#    first_name = models.CharField(max_length =20)
+#    last_name = models.CharField(max_length = 20)
+#    email_address = models.EmailField(default="unknown")
+#    score_accuracy = models.IntegerField()
+
+
 class GameInfo(models.Model): 
     #TODO: Add field for the individuals who validated score 2-3 mapping to a USER
 
@@ -103,11 +113,15 @@ class GameInfo(models.Model):
     winlosslink_winner =  models.ForeignKey(WinLossRecord, default='0', related_name='winners_record')
     winlosslink_loser = models.ForeignKey(WinLossRecord, default='0', related_name='loserss_record')
 
+    #link to ScoreKeepers
+    #scorekeeper1 = models.ForeignKey(User, default=0, related_name='scorekeeper1')
+    #scorekeeper2 = models.ForeignKey(User, default=0, related_name='scorekeeper2')
     def __str__(self):
     #    return self.away_team.__str__ + "at" + self.home_team.__str__
         return str(self.id)
     
     
 
+    
 
 
