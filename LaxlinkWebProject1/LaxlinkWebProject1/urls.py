@@ -6,7 +6,7 @@ from datetime import datetime
 import site
 from django.conf.urls import url
 import django.contrib.auth.views
-
+from django.conf.urls import include
 import app.forms
 import app.views
 
@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'reg_form', app.views.register, name='reg_form'),
     url('thankyouregister',app.views.thankyouregister),
     url('failregister',app.views.failregistration),
+
       
     url(r'^login/$',
         django.contrib.auth.views.login,

@@ -3,7 +3,10 @@ Definition of forms.
 """
 
 from django import forms
+from django.db import models
 from app.models import Snippet, TeamData
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User 
 from django.utils.translation import ugettext_lazy as _
@@ -48,6 +51,20 @@ class RegistrationForm(UserCreationForm):
             user.save()
 
         return user
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default=0)
+    location: models.CharField(max_length=30, blank=True)
+    favorite_teams: models.ManyToManyField(TeamData)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
 
 class CreateTeamInfoForm(forms.ModelForm):
     
