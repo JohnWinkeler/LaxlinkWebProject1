@@ -77,7 +77,7 @@ class WinLossRecord(models.Model):
     wincount = models.IntegerField(default=0)
     losscount = models.IntegerField(default=0)
     year = models.IntegerField(default=0)
-    teamkey =  models.ForeignKey(TeamData, default='0', related_name="team")
+    teamkey =  models.ForeignKey(TeamData, default='0', related_name="team", on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.id)
@@ -95,8 +95,8 @@ class GameInfo(models.Model):
     #TODO: Add field for the individuals who validated score 2-3 mapping to a USER
 
     #Teams involved
-    Home_team = models.ForeignKey(TeamData, default='0', related_name="home_team")
-    Away_team = models.ForeignKey(TeamData, default="0", related_name="away_team")
+    Home_team = models.ForeignKey(TeamData, default='0', related_name="home_team", on_delete=models.PROTECT)
+    Away_team = models.ForeignKey(TeamData, default="0", related_name="away_team", on_delete=models.PROTECT)
 
     #Score - Updated  by users
     home_score = models.IntegerField(default=0)
@@ -110,8 +110,8 @@ class GameInfo(models.Model):
     game_validated = models.BooleanField(default=False)
 
     #Link to seasonal record, may reduce the traversal of table to generate stats
-    winlosslink_winner =  models.ForeignKey(WinLossRecord, default='0', related_name='winners_record')
-    winlosslink_loser = models.ForeignKey(WinLossRecord, default='0', related_name='loserss_record')
+    winlosslink_winner =  models.ForeignKey(WinLossRecord, default='0', related_name='winners_record', on_delete=models.PROTECT)
+    winlosslink_loser = models.ForeignKey(WinLossRecord, default='0', related_name='loserss_record', on_delete=models.PROTECT)
 
     #link to ScoreKeepers
     #scorekeeper1 = models.ForeignKey(User, default=0, related_name='scorekeeper1')

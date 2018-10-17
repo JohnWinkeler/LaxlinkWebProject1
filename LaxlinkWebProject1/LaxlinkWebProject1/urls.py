@@ -3,6 +3,7 @@ Definition of urls for LaxlinkWebProject1.
 """
 
 from datetime import datetime
+from django.urls import path
 import site
 from django.conf.urls import url
 import django.contrib.auth.views
@@ -21,6 +22,10 @@ admin.site.register(app.models.WinLossRecord)
 
 urlpatterns = [
     # Examples:
+    # Uncomment the next line to enable the admin:
+    # url(r'^admin/', include(admin.site.urls)),
+    path('admin', admin.site.urls),
+
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about$', app.views.about, name='about'),
@@ -35,7 +40,8 @@ urlpatterns = [
 
       
     url(r'^login/$',
-        django.contrib.auth.views.login,
+        #django.contrib.auth.views.login,
+        django.contrib.auth.login,
         {
             'template_name': 'app/login.html',
             'authentication_form': app.forms.BootstrapAuthenticationForm,
@@ -47,7 +53,8 @@ urlpatterns = [
         },
         name='login'),
     url(r'^logout$',
-        django.contrib.auth.views.logout,
+        #django.contrib.auth.views.logout,
+        django.contrib.auth.logout,
         {
             'next_page': '/',
         },
@@ -57,5 +64,6 @@ urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    #url(r'^admin/', include(admin.site.urls)),
+    #path(r'^admin2/', admin.site.urls),
 ]
