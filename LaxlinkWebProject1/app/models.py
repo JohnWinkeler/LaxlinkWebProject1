@@ -16,6 +16,7 @@ GAMETYPES = (
 )
 
 DIVISIONS = (
+    ('Unknown', 'Unknown'),
     ('HSD1', 'High School D1'),
     ('HSD2', 'High School D2'),
     ('HSJV', 'High School JV'),
@@ -25,9 +26,11 @@ DIVISIONS = (
 ) 
 
 STATES = (
-    ('TX', 'Texas'),
+    ('Unknown', 'Unknown'),
     ('LA', 'Lousiana'),
-    ('OK', 'Oklahoma')
+    ('OK', 'Oklahoma'),
+    ('TX', 'Texas'),
+  
 )
 
 CONFERENCE = (
@@ -57,13 +60,13 @@ class Snippet(models.Model):
 # Create your models here.
 
 class TeamData(models.Model):
-    name = models.CharField("Team Name", max_length=100)
+    name = models.CharField("Team Name", max_length=100, default="")
     coach = models.CharField(max_length=100, default="Unknown")
     contact_name = models.CharField(max_length=100, default="USER")
     coach_email = models.EmailField(default="unknown")
-    state =  models.CharField(max_length=2, choices=STATES)
+    state =  models.CharField(max_length=2, choices=STATES, default="Unknown")
     conference = models.CharField(max_length=8, choices=CONFERENCE, default="NONE")
-    division = models.CharField(max_length=6, choices=DIVISIONS)
+    division = models.CharField(max_length=6, choices=DIVISIONS, default="Unknown")
     powerrating = models.IntegerField(default=0)
 
     def __str__(self):
@@ -120,8 +123,3 @@ class GameInfo(models.Model):
     #    return self.away_team.__str__ + "at" + self.home_team.__str__
         return str(self.id)
     
-    
-
-    
-
-

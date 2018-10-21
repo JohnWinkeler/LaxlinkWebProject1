@@ -5,9 +5,8 @@ Definition of urls for LaxlinkWebProject1.
 from datetime import datetime
 from django.urls import path
 import site
-from django.conf.urls import url
+from django.conf.urls import url, include
 import django.contrib.auth.views
-from django.conf.urls import include
 import app.forms
 import app.views
 
@@ -25,7 +24,7 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
     path('admin', admin.site.urls),
-
+    path('teamquery', app.views.queryteam),
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about$', app.views.about, name='about'),
@@ -37,8 +36,9 @@ urlpatterns = [
     url(r'reg_form', app.views.register, name='reg_form'),
     url('thankyouregister',app.views.thankyouregister),
     url('failregister',app.views.failregistration),
+ 
 
-      
+     
     url(r'^login/$',
         #django.contrib.auth.views.login,
         django.contrib.auth.login,
@@ -63,7 +63,5 @@ urlpatterns = [
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    # Uncomment the next line to enable the admin:
-    #url(r'^admin/', include(admin.site.urls)),
-    #path(r'^admin2/', admin.site.urls),
+   
 ]

@@ -92,3 +92,54 @@ class TeamForm(forms.ModelForm):
         model = TeamData
         fields = ('name','coach')
 
+class FindTeamForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+
+        self.helper.add_input(Submit('submit', 'Submit'))
+
+        super(FindTeamForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = TeamData
+        fields = ('name', 'coach', 'state', 'conference', 'division')
+
+
+class QueryTeamInfoForm(forms.Form):
+    # The query component 
+    dbteamNames = ['None']
+    dbDivisions = ['None']
+    dbTeamState = ['None']
+    dbConferences = ['None']
+    widget = dict()
+
+    def __str__(self):
+        return str(self.dbteamNames + self.dbDivisions + self.dbTeamState + self.dbConferences )
+
+    def __init__(self, *args, **kwargs):
+        # Appears need to call super to init properly to get fields
+        super(QueryTeamInfoForm, self).__init__(*args, **kwargs)
+        team_set = TeamData.objects.all()
+
+        for entry in team_set:
+            if entry.name not in self.dbteamNames:
+                self.dbteamNames.append(entry.name)
+            if entry.division not in self.dbDivisions:
+               self.dbDivisions.append(entry.division)
+            if entry.state not in self.dbTeamState:
+                self.dbTeamState.append(entry.state)
+            if entry.conference not in self.dbConferences:
+                self.dbConferences.append(entry.conference)
+
+        asDict = {k: v for v, k in enumerate(self.dbConferences)}
+        self.widget=forms.Select(choices=asDict)
+        self.choiceFormConf=forms.ChoiceField(choices=asDict)
+
+        self.fields['teamfield'] = forms.ChoiceField(choices=self.dbteamNames, required=False)
+        self.fields['divisionfield'] = forms.ChoiceField(choices=self.dbDivisions, required = False)
+        self.fields['statefield'] = forms.ChoiceField(choices=self.dbTeamState, required=False)
+        self.fields['conferencefield'] = forms.ChoiceField(choices=self.dbConferences, required=False)
+
+
+     
+

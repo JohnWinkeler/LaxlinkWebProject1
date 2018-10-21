@@ -54,16 +54,19 @@
     <Folder Include="app\templates\" />
     <Folder Include="app\templates\app\" />
     <Folder Include="app\templates\app\accounts\" />
+    <Folder Include="app\templates\app\Forum\" />
+    <Folder Include="app\templates\app\team\" />
     <Folder Include="LaxlinkWebProject1\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\templates\app\accounts\failregister.html" />
     <Content Include="app\templates\app\accounts\thankyouregister.html" />
     <Content Include="app\templates\app\WebPage1.html" />
-    <Content Include="app\templates\app\createteaminfo.html" />
+    <Content Include="app\templates\app\team\createteaminfo.html" />
     <Content Include="app\templates\app\GamesPage.html" />
-    <Content Include="app\templates\app\gameschedule.html" />
+    <Content Include="app\templates\app\team\gameschedule.html" />
     <Content Include="app\templates\app\accounts\reg_form.html" />
+    <Content Include="app\templates\app\team\teamquery.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />

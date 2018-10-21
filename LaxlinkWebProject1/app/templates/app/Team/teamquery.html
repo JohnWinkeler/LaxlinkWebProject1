@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+{% load crispy_forms_tags %}
+ <h1>Find Team Info</h1>
+ {% csrf_token %}
+    
+ <div class="fieldWrapper">
+     {{ form.dbConferences}}
+     {{form.choiceFormConf}}    
+     <select>
+        {% for conf in form.choiceFormConf.choices %}
+       
+            <option value="{{ conf }}">{{ conf }}</option>
+       
+        {% endfor %}
+     </select>
+
+ </div>
+
+ <button type="submit">Find</button>
+
+
+

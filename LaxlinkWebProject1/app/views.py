@@ -6,7 +6,7 @@ from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpRequest, HttpResponse
 from django.template import RequestContext
 from datetime import datetime
-from app.forms import CreateTeamInfoForm, SnippetForm, TeamForm, RegistrationForm
+from app.forms import CreateTeamInfoForm, SnippetForm, TeamForm, RegistrationForm, FindTeamForm, QueryTeamInfoForm
 from app.models import *
 from django.contrib.auth.forms import UserCreationForm
 
@@ -110,7 +110,7 @@ def createteaminfo(request):
 
     teamform = CreateTeamInfoForm()
     return render( request, 
-                  'app/createteaminfo.html', 
+                  'app/team/createteaminfo.html', 
                   {
                       'title': 'TeamInfo',
                       'form' : teamform})
@@ -125,7 +125,7 @@ def snippet_detail(request):
 
     teamform = SnippetForm()
     return render( request, 
-                  'app/createteaminfo.html', 
+                  'app/team/createteaminfo.html', 
                   {
                       'title': 'TeamInfo',
                       'form' : teamform
@@ -141,7 +141,7 @@ def teamSnippet_detail(request):
 
     tempForm=TeamForm()
     return render (request,
-                   'app/createteaminfo.html',
+                   'app/team/createteaminfo.html',
                    {
                         'title': 'TeamInfo',
                         'form' : tempForm
@@ -151,7 +151,7 @@ def gameschedule(request):
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/gameschedule.html',
+        'app/team/gameschedule.html',
         {
             'title':'Game Schedule',
             'year':datetime.now().year,
@@ -181,3 +181,37 @@ def thankyouregister(request):
 
 def failregistration(request):
     return render(request, 'app/accounts/failregister.html')
+
+def queryteam(request):
+    template_name = 'app/team/teamquery.html'
+    #form = FindTeamForm()
+    form = QueryTeamInfoForm()
+    # Grab the team data so that unique keys can be determined
+    #team_set = TeamData.objects.all()
+
+
+    #dbteamNames = []
+    #dbDivisions = []
+    #dbTeamState = []
+    #dbConferences = []
+
+    #for entry in team_set:
+    #    if entry.name not in dbteamNames:
+    #        dbteamNames.append(entry.name)
+
+    #    if entry.division not in dbDivisions:
+    #        dbDivisions.append(entry.division)
+
+    #   if entry.state not in dbTeamState:
+    #        dbTeamState.append(entry.state)
+
+    #    if entry.conference not in dbConferences:
+    #        dbConferences.append(entry.conference)
+
+    #form.fields.name = "TEST STRING"
+    #def get(self, request):
+    #    form = FindTeamForm()
+
+    #   return render(request, self.template_name, {'form':form})
+    asDict = {k: v for v, k in enumerate(form.dbConferences)}
+    return render(request,'app/team/teamquery.html' , {'form':form, 'conferenceList': form.dbConferences } )
