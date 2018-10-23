@@ -213,5 +213,9 @@ def queryteam(request):
     #    form = FindTeamForm()
 
     #   return render(request, self.template_name, {'form':form})
-    asDict = {k: v for v, k in enumerate(form.dbConferences)}
-    return render(request,'app/team/teamquery.html' , {'form':form, 'conferenceList': form.dbConferences } )
+    #asDict = {k: v for v, k in enumerate(form.dbConferences)}
+    return render(request,'app/team/teamquery.html' , {'form':form } )
+
+def load_teams(request):
+    conferencevalue = request.GET.get('conference')
+

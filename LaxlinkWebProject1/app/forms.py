@@ -132,8 +132,11 @@ class QueryTeamInfoForm(forms.Form):
                 self.dbConferences.append(entry.conference)
 
         asDict = {k: v for v, k in enumerate(self.dbConferences)}
+        namesasDict = {k: v for v, k in enumerate(self.dbteamNames)}
+
         self.widget=forms.Select(choices=asDict)
         self.choiceFormConf=forms.ChoiceField(choices=asDict)
+        self.choiceTeamNames = forms.ChoiceField(choices=namesasDict)
 
         self.fields['teamfield'] = forms.ChoiceField(choices=self.dbteamNames, required=False)
         self.fields['divisionfield'] = forms.ChoiceField(choices=self.dbDivisions, required = False)

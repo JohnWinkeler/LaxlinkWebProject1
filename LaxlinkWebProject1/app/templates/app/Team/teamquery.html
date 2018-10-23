@@ -1,22 +1,36 @@
 ﻿<!DOCTYPE html>
+{% extends "app/layout.html" %}
 {% load crispy_forms_tags %}
- <h1>Find Team Info</h1>
+
+<h1>Find Team Info</h1>
  {% csrf_token %}
-    
- <div class="fieldWrapper">
-     {{ form.dbConferences}}
-     {{form.choiceFormConf}}    
-     <select>
+
+{% block content %}
+
+<div class="fieldWrapper">
+    <h3> Team Conference</h3>
+    <select>
         {% for conf in form.choiceFormConf.choices %}
-       
-            <option value="{{ conf }}">{{ conf }}</option>
-       
+
+        <option value="{{ conf }}">{{ conf }}</option>
+
         {% endfor %}
-     </select>
+    </select>
+</div>
+<button type="submit" name="filter_conference" value="filter_conference">Filter by Conference</button>
 
- </div>
+<div class="fieldWrapper">
+    <h3> Teams Tracked </h3>
+    <select>
+        {% for teamName in form.choiceTeamNames.choices %}
 
- <button type="submit">Find</button>
+        <option value="{{ teamName }}">{{ teamName }}</option>
 
+        {% endfor %}
+    </select>
+</div>
+<button type="submit" name="select_team" value="select_team">Select Team</button>
+
+{% endblock %}
 
 
