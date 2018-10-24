@@ -8,6 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 GAMETYPES = (
+    ('A', 'Any'),
     ('S', 'Scrimmage'),
     ('R', 'Regular Season'),
     ('P', 'Playoff'),
@@ -16,7 +17,7 @@ GAMETYPES = (
 )
 
 DIVISIONS = (
-    ('Unknown', 'Unknown'),
+    ('ANY', 'Any'),
     ('HSD1', 'High School D1'),
     ('HSD2', 'High School D2'),
     ('HSJV', 'High School JV'),
@@ -26,7 +27,7 @@ DIVISIONS = (
 ) 
 
 STATES = (
-    ('Unknown', 'Unknown'),
+    ('ANY', 'Any'),
     ('LA', 'Lousiana'),
     ('OK', 'Oklahoma'),
     ('TX', 'Texas'),
@@ -34,7 +35,7 @@ STATES = (
 )
 
 CONFERENCE = (
-    ('NONE', 'No Conference Specified'),
+    ('ANY', 'Any Conference'),
     ('TGHSLL-N', 'Texas (TGHSLL) North Conference'),
     ('TGHSLL-C', 'Texas (TGHSLL) Central Conference'),
     ('TGHSLL-S', 'Texas (TGHSLL) South Conference'),
@@ -47,9 +48,14 @@ SEASON = (
     ('WINTER', 'Winter'),
     ('INDOOR', 'Indoor'),
     ('TRAVEL', 'Travel'),
-    ('NONE', 'None'),
+    ('ANY', 'Any'),
 )
 
+GENDER = (
+    ('MENS', 'Mens'),
+    ('WOMENS', 'Womens'),
+    ('MIXED', 'Mixed'),
+)
 
 class Snippet(models.Model):
     name = models.CharField(max_length=100)
@@ -65,8 +71,10 @@ class TeamData(models.Model):
     contact_name = models.CharField(max_length=100, default="USER")
     coach_email = models.EmailField(default="unknown")
     state =  models.CharField(max_length=2, choices=STATES, default="Unknown")
-    conference = models.CharField(max_length=8, choices=CONFERENCE, default="NONE")
+    conference = models.CharField(max_length=8, choices=CONFERENCE, default="Any")
     division = models.CharField(max_length=6, choices=DIVISIONS, default="Unknown")
+    gender = models.CharField(max_length=8, choices=GENDER, default="Mixed")
+
     powerrating = models.IntegerField(default=0)
 
     def __str__(self):

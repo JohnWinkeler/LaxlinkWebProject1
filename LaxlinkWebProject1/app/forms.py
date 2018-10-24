@@ -107,10 +107,14 @@ class FindTeamForm(forms.ModelForm):
 
 class QueryTeamInfoForm(forms.Form):
     # The query component 
-    dbteamNames = ['None']
-    dbDivisions = ['None']
-    dbTeamState = ['None']
-    dbConferences = ['None']
+    dbteamNames = ['Any']
+    dbDivisions = ['Any']
+    dbTeamState = ['Any']
+    dbConferences = ['Any']
+    filtersInUse = {"state" : "",
+                    "conference": "",
+                    "name" : "",
+                    "division": ""}
     widget = dict()
 
     def __str__(self):
@@ -133,15 +137,19 @@ class QueryTeamInfoForm(forms.Form):
 
         asDict = {k: v for v, k in enumerate(self.dbConferences)}
         namesasDict = {k: v for v, k in enumerate(self.dbteamNames)}
+        stateasDict = {k: v for v, k in enumerate(self.dbTeamState)}
+        confasDict  = {k: v for v, k in enumerate(self.dbConferences)}
 
         self.widget=forms.Select(choices=asDict)
-        self.choiceFormConf=forms.ChoiceField(choices=asDict)
-        self.choiceTeamNames = forms.ChoiceField(choices=namesasDict)
+        self.choiceFormConf=forms.ChoiceField(choices = asDict)
+        self.choiceTeamNames = forms.ChoiceField(choices = namesasDict)
+        self.choiceTeamState = forms.ChoiceField(choices = stateasDict)
+        self.choiceTeamConf = forms.ChoiceField(choices = confasDict)
 
-        self.fields['teamfield'] = forms.ChoiceField(choices=self.dbteamNames, required=False)
-        self.fields['divisionfield'] = forms.ChoiceField(choices=self.dbDivisions, required = False)
-        self.fields['statefield'] = forms.ChoiceField(choices=self.dbTeamState, required=False)
-        self.fields['conferencefield'] = forms.ChoiceField(choices=self.dbConferences, required=False)
+        #self.fields['teamfield'] = forms.ChoiceField(choices=self.dbteamNames, required=False)
+        #self.fields['divisionfield'] = forms.ChoiceField(choices=self.dbDivisions, required = False)
+        #self.fields['statefield'] = forms.ChoiceField(choices=self.dbTeamState, required=False)
+        #self.fields['conferencefield'] = forms.ChoiceField(choices=self.dbConferences, required=False)
 
 
      

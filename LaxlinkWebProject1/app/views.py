@@ -2,10 +2,12 @@
 Definition of views.
 """
 
-from django.shortcuts import render, render_to_response, redirect
-from django.http import HttpRequest, HttpResponse
-from django.template import RequestContext
 from datetime import datetime
+from django import forms
+from django.db.models import Q
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render, render_to_response, redirect
+from django.template import RequestContext
 from app.forms import CreateTeamInfoForm, SnippetForm, TeamForm, RegistrationForm, FindTeamForm, QueryTeamInfoForm
 from app.models import *
 from django.contrib.auth.forms import UserCreationForm
@@ -182,40 +184,131 @@ def thankyouregister(request):
 def failregistration(request):
     return render(request, 'app/accounts/failregister.html')
 
+def filter_not_none(filter):
+    if filter != "None":
+        return Q(filter=filter)
+    else:
+        return Q()
+
 def queryteam(request):
     template_name = 'app/team/teamquery.html'
     #form = FindTeamForm()
+    teamObject=TeamData()
     form = QueryTeamInfoForm()
-    # Grab the team data so that unique keys can be determined
-    #team_set = TeamData.objects.all()
+  
+    if request.method == 'GET':
+        #form = QueryTeamInfoForm()
+        return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
+    elif request.method == 'POST':
+        
+        q_object = Q()  
+        #if request.POST['team_filters']:
+        if request.POST.get('team_filters', False):
+            #Build value list for representation in displayed user form
+            # If the value is 'None' send the entire list back otherwise
+            # build a form choicefield composed of Reset and dropdown value
+            #Build the Q list for team lookaup as we go
+            if (request.POST['teamState'] != "Any"):
+                stateasDict = (
+                    (request.POST['teamState']),
+                    ("Any"),
+                 )
+                form.choiceTeamState = forms.ChoiceField(choices = stateasDict)
+                q_object.add(Q(state = request.POST['teamState']),Q.AND)
+
+            if (request.POST['teamConference'] != 'Any'):
+                confasDict =(
+                    (request.POST['teamConference']),
+                    ("Any"),
+                 )
+                form.choiceFormConf = forms.ChoiceField(choices = confasDict)
+                q_object.add(Q(conference = request.POST['teamConference']),Q.AND)
 
 
-    #dbteamNames = []
-    #dbDivisions = []
-    #dbTeamState = []
-    #dbConferences = []
+            team_list = TeamData.objects.filter(q_object)
+            #build the team list for display
+            teamnamesasList = []
+            if team_list.count() > 0:
+                for team in team_list:
+                    #tempName = 
+                    teamnamesasList.append(team.name)
+                form.choiceTeamNames = forms.ChoiceField(choices = teamnamesasList)
 
-    #for entry in team_set:
-    #    if entry.name not in dbteamNames:
-    #        dbteamNames.append(entry.name)
 
-    #    if entry.division not in dbDivisions:
-    #        dbDivisions.append(entry.division)
 
-    #   if entry.state not in dbTeamState:
-    #        dbTeamState.append(entry.state)
+            #now that filter are rebuilt for display in the template, populate the
+            #appropriate teams in a list
+            #Build filter chain and discard any None. All fields are required at team creation
+            # the none is a human input to disregard that particular filter on a search
+            #q_object = Q()                                    
+            #if request.POST['teamState'] != "Any":
+            #    q_object.add(Q(state = request.POST['teamState']),Q.AND)
+            #if request.POST['teamConference'] != "Any":
+            #    q_object.add(Q(conference = request.POST['teamConference']),Q.AND)
+            #if request.POST['teamgender'] != "None":
+            #    q_object.add(Q(gender = request.POST['teamGender']),Q.AND)
 
-    #    if entry.conference not in dbConferences:
-    #        dbConferences.append(entry.conference)
+            
+            
+            #if team_list.count() == 1:
+                
+                # display the only matching team entry and try to 
+                # pass it down to the reuest post for select team 
+            #    team = team_list[0]
+                #request.POST['select_team'] = "internal_selection"
+                #request.POST["dropTeamName"] = team.name6    
+                #stateasDict = (
+                #    (request.POST['teamState']),
+                #    ("Any"),
+                #)
+                #form.choiceTeamState = forms.ChoiceField(choices = stateasDict)
+                #confasDict =(
+                #    (request.POST['teamConference']),
+                #    ("Any"),
+                # )
+                #form.choiceFormConf = forms.ChoiceField(choices = confasDict)
 
-    #form.fields.name = "TEST STRING"
-    #def get(self, request):
-    #    form = FindTeamForm()
+           #     nameasDict = (
+           #        (team_list[0].name),
+           #        ("Any"),
+           #     )
+           #     form.choiceTeamNames = forms.ChoiceField(choices = nameasDict)
 
-    #   return render(request, self.template_name, {'form':form})
-    #asDict = {k: v for v, k in enumerate(form.dbConferences)}
+           #     return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject})
+            #else:
+                #more than one matching in database return team list
+                #lets capture all of the not None filters sent and return the 
+                #list of teams that match the filters provided. It will be important to use the 
+                #captured filters in the final lookup to grab team data from the
+                # database
+
+            #     nameasDict = (
+            #       (team_list[0].name),
+            #       ("Any"),
+            #    )
+
+            #    form.choiceTeamNames = forms.ChoiceField(choices = nameasDict)
+
+
+
+
+
+
+
+             #   return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject})
+
+            
+            
+        if request.POST.get('select_team', False):
+            #if request.POST['select_team']:
+            # lookup team and display team data
+            #team2 = TeamData.objects.get(name = 'Team2')
+            #team_filter = TeamData.objects.filter(name = 'Team3')
+            #coach2=team2.name
+            teamObject = TeamData.objects.get(name = (request.POST['dropTeamName']))
+            form = QueryTeamInfoForm()
+                
+            return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
+
+
     return render(request,'app/team/teamquery.html' , {'form':form } )
-
-def load_teams(request):
-    conferencevalue = request.GET.get('conference')
-

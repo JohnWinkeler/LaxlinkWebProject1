@@ -3,34 +3,58 @@
 {% load crispy_forms_tags %}
 
 <h1>Find Team Info</h1>
- {% csrf_token %}
+{% csrf_token %}
 
 {% block content %}
 
 <div class="fieldWrapper">
-    <h3> Team Conference</h3>
-    <select>
-        {% for conf in form.choiceFormConf.choices %}
+    <h3> Team State</h3>
+    <form method="post">
+        <select name="teamState">
+            {% for state in form.choiceTeamState.choices %}
 
-        <option value="{{ conf }}">{{ conf }}</option>
+            <option value="{{ state }}">{{ state }}</option>
 
-        {% endfor %}
-    </select>
+            {% endfor %}
+        </select>
+        <h3> Team Conference</h3>
+        <select name="teamConference">
+            {% for conf in form.choiceFormConf.choices %}
+
+            <option value="{{ conf }}">{{ conf }}</option>
+
+            {% endfor %}
+        </select>
+
+        {% csrf_token %}
+        <button type="submit" name="team_filters" value="team_filters">Apply Filters</button>
+
+         <h3> Teams Tracked </h3>
+   
+        <select name="dropTeamName">
+            {% for teamName in form.choiceTeamNames.choices %}
+
+            <option value="{{ teamName }}">{{ teamName }}</option>
+
+            {% endfor %}
+        </select>
+
+
+        <button type="submit" name="select_team" value="select_team">Select Team</button>
+
+
+    </form>
 </div>
-<button type="submit" name="filter_conference" value="filter_conference">Filter by Conference</button>
+
 
 <div class="fieldWrapper">
-    <h3> Teams Tracked </h3>
-    <select>
-        {% for teamName in form.choiceTeamNames.choices %}
-
-        <option value="{{ teamName }}">{{ teamName }}</option>
-
-        {% endfor %}
-    </select>
+    <h3> Desired Team </h3>
+    <form method="post">
+        {% csrf_token %}
+           
+        {{ teamInfo }}
+    </form>
 </div>
-<button type="submit" name="select_team" value="select_team">Select Team</button>
-
 {% endblock %}
 
 
