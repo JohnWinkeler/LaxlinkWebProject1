@@ -146,11 +146,6 @@ class QueryTeamInfoForm(forms.Form):
         self.choiceTeamState = forms.ChoiceField(choices = stateasDict)
         self.choiceTeamConf = forms.ChoiceField(choices = confasDict)
 
-        #self.fields['teamfield'] = forms.ChoiceField(choices=self.dbteamNames, required=False)
-        #self.fields['divisionfield'] = forms.ChoiceField(choices=self.dbDivisions, required = False)
-        #self.fields['statefield'] = forms.ChoiceField(choices=self.dbTeamState, required=False)
-        #self.fields['conferencefield'] = forms.ChoiceField(choices=self.dbConferences, required=False)
-
 
      
 

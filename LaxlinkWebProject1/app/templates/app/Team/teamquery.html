@@ -51,8 +51,20 @@
     <h3> Desired Team </h3>
     <form method="post">
         {% csrf_token %}
-           
-        {{ teamInfo }}
+        
+        <label>Team Name:</label>
+        {{ teamInfo.name }}
+        <label>Team Home State</label> 
+        {{ teamInfo.state}}
+        <label>Team Division</label> 
+        {{ teamInfo.division }}
+        <label>Conference</label> 
+        {{teamInfo.conference}}
+        <label>Coach</label> 
+        {{teamInfo.coach}}
+        <label>Power Rating</label> 
+        {{teamInfo.powerrating}}
+
     </form>
 </div>
 {% endblock %}

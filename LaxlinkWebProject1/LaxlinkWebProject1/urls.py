@@ -6,7 +6,10 @@ from datetime import datetime
 from django.urls import path
 import site
 from django.conf.urls import url, include
+#from django.contrib.auth.views import 
 import django.contrib.auth.views
+from django.contrib.auth.views import auth_login
+from django.contrib.auth import logout, login
 import app.forms
 import app.views
 
@@ -19,12 +22,14 @@ admin.site.register(app.models.TeamData)
 admin.site.register(app.models.GameInfo)
 admin.site.register(app.models.WinLossRecord)
 
+
 urlpatterns = [
     # Examples:
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
     path('admin', admin.site.urls),
     path('teamquery', app.views.queryteam),
+    path('accounts/', include('django.contrib.auth.urls')), 
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about$', app.views.about, name='about'),
@@ -36,32 +41,8 @@ urlpatterns = [
     url(r'reg_form', app.views.register, name='reg_form'),
     url('thankyouregister',app.views.thankyouregister),
     url('failregister',app.views.failregistration),
- 
-
-     
-    url(r'^login/$',
-        #django.contrib.auth.views.login,
-        django.contrib.auth.login,
-        {
-            'template_name': 'app/login.html',
-            'authentication_form': app.forms.BootstrapAuthenticationForm,
-            'extra_context':
-            {
-                'title': 'Log in',
-                'year': datetime.now().year,
-            }
-        },
-        name='login'),
-    url(r'^logout$',
-        #django.contrib.auth.views.logout,
-        django.contrib.auth.logout,
-        {
-            'next_page': '/',
-        },
-        name='logout'),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-   
+    url(r'^logout$', app.views.logout_view, name='home'),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),   
 ]
+ 
+   

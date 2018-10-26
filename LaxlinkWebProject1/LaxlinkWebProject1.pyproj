@@ -55,12 +55,14 @@
     <Folder Include="app\templates\app\" />
     <Folder Include="app\templates\app\accounts\" />
     <Folder Include="app\templates\app\Forum\" />
+    <Folder Include="app\templates\Registration\" />
     <Folder Include="app\templates\app\team\" />
     <Folder Include="LaxlinkWebProject1\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\templates\app\accounts\failregister.html" />
     <Content Include="app\templates\app\accounts\thankyouregister.html" />
+    <Content Include="app\templates\app\accounts\logout.html" />
     <Content Include="app\templates\app\WebPage1.html" />
     <Content Include="app\templates\app\team\createteaminfo.html" />
     <Content Include="app\templates\app\GamesPage.html" />
@@ -95,7 +97,7 @@
     <Content Include="app\templates\app\contact.html" />
     <Content Include="app\templates\app\index.html" />
     <Content Include="app\templates\app\layout.html" />
-    <Content Include="app\templates\app\login.html" />
+    <Content Include="app\templates\Registration\login.html" />
     <Content Include="app\templates\app\loginpartial.html" />
   </ItemGroup>
   <ItemGroup>

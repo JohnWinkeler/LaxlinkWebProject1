@@ -4,6 +4,7 @@ Definition of models.
 
 from django.db import models
 from django.utils import datetime_safe
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -131,3 +132,26 @@ class GameInfo(models.Model):
     #    return self.away_team.__str__ + "at" + self.home_team.__str__
         return str(self.id)
     
+class UserProfile(models.Model):
+    ROLE_CHOICES = (
+        ('GENERAL','General User'),
+        ('MANAGER','Manager'),
+        ('COACH', 'Coach'),
+        )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default=1)
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
+    location = models.CharField(max_length=30, blank=True)
+    email = models.EmailField(default="unknown")
+    favorites = models.ManyToManyField
+
+    def __str__(self):
+        return self.user.username
+
+#@receiver(post_save, sender=User)
+#def create_user_profile(sender, instance, created, **kwargs):
+#    if created:
+#        UserProfile.objects.create(user=instance)
+
+#@receiver(post_save, sender=User)
+#def save_user_profile(sender, instance, **kwargs):
+#    instance.profile.save()

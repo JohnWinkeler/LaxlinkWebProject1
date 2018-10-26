@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+{% extends "app/layout.html" %}
+ 
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+{% block content %}
+<div class="container">
+    <h1>Thank you for registering with LaxLink</h1>
+    <form method="post">
+        {%csrf_token %}
+        {{form.as_p}}
+    </form>
+</div>
+{% endblock %}
+</html>
