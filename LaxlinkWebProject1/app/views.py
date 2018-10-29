@@ -59,6 +59,7 @@ class GameRecord:
     verified=''
     homescore=''
     awayscore=''
+    bgColor=''
 
 def WebPage1(request):
     """Renders the WebPage1 page."""
@@ -74,8 +75,26 @@ def WebPage1(request):
     #)
     #games = GameInfo.objects.filter(away_team = 2)
 
+    # Use the session information to choose the team to display
+    # the correct team information 
 
-    teamrequested = 2
+    q_object = Q() 
+    if (request.session['teamState']!= "Any"):
+        q_object.add(Q(state = request.session['teamState']),Q.AND)
+    if (request.session['teamConference']!= "Any"):
+        q_object.add(Q(conference = request.session['teamConference']),Q.AND)
+    if (request.session['dropTeamName']!= "Any"):
+        q_object.add(Q( name = request.session['dropTeamName']),Q.AND)
+
+    #request.session['teamState'] = request.POST['teamState']
+    #request.session['teamConference'] = request.POST['teamConference']
+    #request.session['dropTeamName'] = request.POST['dropTeamName']
+    # q_object.add(Q(conference = request.POST['teamConference']),Q.AND)
+    team_list = TeamData.objects.filter(q_object)
+
+
+
+    teamrequested = team_list[0]
     games_set = GameInfo.objects.filter(Away_team = teamrequested)| GameInfo.objects.filter(Home_team = teamrequested)
     gamedatalist = []
 
@@ -93,11 +112,25 @@ def WebPage1(request):
         else:
             tempGameRecord.verified='Unverified'
 
+        #now add a flag so that background for games can be colored in html side
+        # first figure out who won or lost
+        winner = ''
+        if (i.away_score < i.home_score):
+            winner = tempGameRecord.hometeamname
+        else:
+            winner = tempGameRecord.awayteamname
+
+        tempGameRecord.bgColor='ffffff'
+        if (winner==teamrequested.name):
+            # set the back ground color to green
+            tempGameRecord.bgColor='33cc3c'
+
+
         #gamedatalist.append(str(gamedate)+ " "+ awayteamname + " at " + hometeamname + " " + verified)
         gamedatalist.append(tempGameRecord)
 
 
-    return render_to_response('app/WebPage1.html', {'teamname': 'PlaceHolder', 'schedule': 'YES','games':gamedatalist})
+    return render_to_response('app/WebPage1.html', {'teamname': 'PlaceHolder', 'schedule': 'YES','display_record':'YES', 'games': gamedatalist })
 
 
 def createteaminfo(request):
@@ -108,11 +141,31 @@ def createteaminfo(request):
         teamform = CreateTeamInfoForm(request.POST)
         if teamform.is_valid():
             name = teamform.cleaned_data['name']
-            print(name)
-            teamform.save()
+            state = teamform.cleaned_data['state']
+            division = teamform.cleaned_data['division']
+            conference = teamform.cleaned_data['conference']
             
+            #Check existing database for duplicate entries
+            
+            teamObjectset = TeamData.objects.filter(name = name, state=state, division=division, conference=conference)
 
-    teamform = CreateTeamInfoForm()
+            if not teamObjectset:
+                #New entry for database go ahead and save it
+                # and set up win loss record dB entry
+                teamform.save()
+                teamObject = TeamData.objects.get(name = name, state=state, division=division, conference=conference)
+                temprecord=WinLossRecord()
+                temprecord.teamkey = teamObject
+                temprecord.save()
+            else:
+                #This is a duplicate entry do NOT save and screw up database
+                return
+
+            
+    else:
+        teamform = CreateTeamInfoForm()
+
+    
     return render( request, 
                   'app/team/createteaminfo.html', 
                   {
@@ -152,15 +205,23 @@ def teamSnippet_detail(request):
                        })
 def gameschedule(request):
     """Renders the home page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/team/gameschedule.html',
-        {
-            'title':'Game Schedule',
-            'year':datetime.now().year,
-        }
-    )
+    return redirect('app/accounts/failregister.html')
+    #if request.method == 'POST':
+    #    #list out the schedule as is known
+    #    # will have to find all games for the team in question
+    #    # display teams as home and away
+    #    # put score if known - 
+    #    # bonus - indicate win versus loss
+   
+    ##assert isinstance(request, HttpRequest)
+    #return render(
+    #    request,
+    #    'app/team/gameschedule.html',
+    #    {
+    #        'title':'Game Schedule',
+    #        'year':datetime.now().year,
+    #    }
+    #)
 
 #def teamschedule(response):
 #    return render(response.
@@ -219,6 +280,7 @@ def queryteam(request):
                  )
                 form.choiceTeamState = forms.ChoiceField(choices = stateasDict)
                 q_object.add(Q(state = request.POST['teamState']),Q.AND)
+                request.session['teamState'] = request.POST['teamState']
 
             if (request.POST['teamConference'] != 'Any'):
                 #tempList = request.POST['teamConference']
@@ -229,6 +291,7 @@ def queryteam(request):
                  )
                 form.choiceFormConf = forms.ChoiceField(choices = confasDict)
                 q_object.add(Q(conference = request.POST['teamConference']),Q.AND)
+                request.session['teamConference'] = request.POST['teamConference']
 
 
             team_list = TeamData.objects.filter(q_object)
@@ -249,7 +312,10 @@ def queryteam(request):
             #team_filter = TeamData.objects.filter(name = 'Team3')
             #coach2=team2.name
             teamObject = TeamData.objects.get(name = (request.POST['dropTeamName']))
-            ##form = QueryTeamInfoForm()
+            
+            #TODO: NEED to verify that this is a unique entry
+
+            request.session['dropTeamName'] = request.POST['dropTeamName']
                 
             return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
 

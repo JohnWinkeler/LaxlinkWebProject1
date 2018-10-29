@@ -52,7 +52,7 @@ th {
                     <th bgcolor="#c9d8f2">Date</th>
                 </tr>
                 {% for game in games %}
-                    <tr>
+                    <tr bgcolor={{game.bgColor}}>
                         <td> {{ game.awayteamname }} </td>
                         <td> {{ game.hometeamname }} </td>
                         <td> {{ game.gamedate }} </td>
