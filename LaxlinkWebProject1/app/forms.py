@@ -52,19 +52,31 @@ class RegistrationForm(UserCreationForm):
 
         return user
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, default=0)
-    location: models.CharField(max_length=30, blank=True)
-    favorite_teams: models.ManyToManyField(TeamData)
+#class ProfileForm(forms.ModelForm):
+#    class Meta:
+#        model = UserProfile
+#        #fields = ('role', 
+#        #          'user', 
+#        #          'favState',
+#        #          'favDivision')
+#        fields = ('user',) 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+##    def save(self, commit=True):
+##        profile=super(ProfileForm, self).save(commit=False)
+##        if commit:
+##            profile.save()
+##         
+##        return profile
+    
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+#@receiver(post_save, sender=User)
+#def create_user_profile(sender, instance, created, **kwargs):
+#    if created:
+#        ProfileForm.objects.create(user=instance)
+
+#@receiver(post_save, sender=User)
+#def save_user_profile(sender, instance, **kwargs):
+#    instance.ProfileForm.save()
 
 class CreateTeamInfoForm(forms.ModelForm):
     

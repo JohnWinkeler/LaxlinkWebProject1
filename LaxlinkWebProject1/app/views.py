@@ -230,9 +230,36 @@ def gameschedule(request):
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+        ##profileform = ProfileForm(request.POST, instance=request.user.profile) ##just added
         if form.is_valid():
-            form.save()
+            #profileForm = 
+            temp=form.save()
+            #profileform = ProfileForm({'user': temp,
+            #                           'role': 1,
+            #                           'favState': 1,
+            #                           'favDivision' : 1}) ##just added
+            #profileform = ProfileForm({'user': temp})
+
+            #profileform.user=temp
+            #profileform.role ='GENERAL_USER'
+            #profileform.favState ='Any'
+            #profileform.favDivision = 'Any'
+            #profileform.favTeams = []
+            #if profileform.is_valid():
+            #    profileform.save(commit=False)
+            #    temp=form.save()
+            #    profileform.save()
+            
+            # create a generic profile block
+            # lookup user from table and insert into block
+            # save profile
             return redirect('app/accounts/thankyouregister.html')
+        #else:
+             #   profileform.save(commit=False)
+             #   temp=form.save()
+             #   if profileform.is_valid():
+             #       profileform.save()
+        #       return redirect('app/accounts/failregister.html')
         else:
             return redirect('app/accounts/failregister.html')
     else:
@@ -246,12 +273,6 @@ def thankyouregister(request):
 
 def failregistration(request):
     return render(request, 'app/accounts/failregister.html')
-
-def filter_not_none(filter):
-    if filter != "None":
-        return Q(filter=filter)
-    else:
-        return Q()
 
 
 def queryteam(request):

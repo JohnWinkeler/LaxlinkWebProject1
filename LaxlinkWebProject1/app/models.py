@@ -3,9 +3,13 @@ Definition of models.
 """
 
 from django.db import models
-from django.utils import datetime_safe
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.utils import datetime_safe
+
+
 
 
 GAMETYPES = (
@@ -132,28 +136,74 @@ class GameInfo(models.Model):
     #    return self.away_team.__str__ + "at" + self.home_team.__str__
         return str(self.id)
     
-class UserProfile(models.Model):
-    ROLE_CHOICES = (
-        ('GENERAL','General User'),
-        ('MANAGER','Manager'),
-        ('COACH', 'Coach'),
-        )
-    user = models.OneToOneField(User, on_delete=models.CASCADE, default=1)
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    location = models.CharField(max_length=30, blank=True)
-    email = models.EmailField(default="unknown")
-    favorites = models.ManyToManyField
+#class UserProfile(models.Model):
+#    ROLE_CHOICES = (
+#        ('CURATOR','Curator'),
+#        ('REGIONAL_MANAGER','Regional Manager'),
+#        ('TEAM_MANAGER', 'Team Manager'),
+#        ('GENERAL_USER', 'General User')
+#        )
+#    role = models.CharField(max_length=20, 
+#                            choices=ROLE_CHOICES, 
+#                            default='GENERAL_USER')
 
-    def __str__(self):
-        return self.user.username
+#    user = models.OneToOneField(User, 
+#                                on_delete=models.CASCADE,
+#                                blank=True, 
+#                                null=True, 
+#                                unique=True)
 
+#    favState = models.CharField(max_length=2, 
+#                                choices=STATES, 
+#                                default="Any")
 
+#    favDivision = models.CharField(max_length=6, 
+#                                   choices=DIVISIONS, 
+#                                   default="Any")
+
+#    def __str__(self):
+#        return self.user.username
+    
+#    def __cleaned_data__(self):
+#        return True
 
 #@receiver(post_save, sender=User)
-#def create_user_profile(sender, instance, created, **kwargs):
+#def create_or_update_user_profile(sender, instance, created, **kwargs):
 #    if created:
 #        UserProfile.objects.create(user=instance)
 
-#@receiver(post_save, sender=User)
-#def save_user_profile(sender, instance, **kwargs):
-#    instance.profile.save()
+class Profile(models.Model):
+    ROLE_CHOICES = (
+        ('CURATOR','Curator'),
+        ('REGIONAL_MANAGER','Regional Manager'),
+        ('TEAM_MANAGER', 'Team Manager'),
+        ('GENERAL_USER', 'General User')
+        )
+
+
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, 
+                            choices=ROLE_CHOICES,
+                            blank=True,
+                            default='GENERAL_USER')
+    favState = models.CharField(max_length=2, 
+                                choices=STATES, 
+                                default="Any")
+
+    favDivision = models.CharField(max_length=6, 
+                                   choices=DIVISIONS, 
+                                   default="Any")
+    def __str__(self):
+        return f'{self.user.username} Profile'
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)    
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, created, **kwargs):
+    instance.profile.save()
+
+

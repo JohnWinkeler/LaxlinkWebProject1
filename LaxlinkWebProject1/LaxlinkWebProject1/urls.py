@@ -21,6 +21,7 @@ admin.site.register(app.models.Snippet)
 admin.site.register(app.models.TeamData)
 admin.site.register(app.models.GameInfo)
 admin.site.register(app.models.WinLossRecord)
+admin.site.register(app.models.Profile)
 
 
 urlpatterns = [
