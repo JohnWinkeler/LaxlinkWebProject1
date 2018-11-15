@@ -86,13 +86,7 @@ def WebPage1(request):
     if (request.session['dropTeamName']!= "Any"):
         q_object.add(Q( name = request.session['dropTeamName']),Q.AND)
 
-    #request.session['teamState'] = request.POST['teamState']
-    #request.session['teamConference'] = request.POST['teamConference']
-    #request.session['dropTeamName'] = request.POST['dropTeamName']
-    # q_object.add(Q(conference = request.POST['teamConference']),Q.AND)
     team_list = TeamData.objects.filter(q_object)
-
-
 
     teamrequested = team_list[0]
     games_set = GameInfo.objects.filter(Away_team = teamrequested)| GameInfo.objects.filter(Home_team = teamrequested)
@@ -230,41 +224,13 @@ def gameschedule(request):
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
-        ##profileform = ProfileForm(request.POST, instance=request.user.profile) ##just added
-        if form.is_valid():
-            #profileForm = 
-            temp=form.save()
-            #profileform = ProfileForm({'user': temp,
-            #                           'role': 1,
-            #                           'favState': 1,
-            #                           'favDivision' : 1}) ##just added
-            #profileform = ProfileForm({'user': temp})
-
-            #profileform.user=temp
-            #profileform.role ='GENERAL_USER'
-            #profileform.favState ='Any'
-            #profileform.favDivision = 'Any'
-            #profileform.favTeams = []
-            #if profileform.is_valid():
-            #    profileform.save(commit=False)
-            #    temp=form.save()
-            #    profileform.save()
-            
-            # create a generic profile block
-            # lookup user from table and insert into block
-            # save profile
-            return redirect('app/accounts/thankyouregister.html')
-        #else:
-             #   profileform.save(commit=False)
-             #   temp=form.save()
-             #   if profileform.is_valid():
-             #       profileform.save()
-        #       return redirect('app/accounts/failregister.html')
+        if form.is_valid():         
+            temp=form.save()   
+            return redirect('app/accounts/thankyouregister.html')    
         else:
             return redirect('app/accounts/failregister.html')
     else:
         form = RegistrationForm()
-
         args = {'form':form}
         return render(request, 'app/accounts/reg_form.html', args)
 
@@ -282,13 +248,18 @@ def queryteam(request):
     form = QueryTeamInfoForm()
   
     if request.method == 'GET':
-        #form = QueryTeamInfoForm()
+        # disable buttons for team manipulation since no team is present
+        form.renderButtons = False
+        request.session['teamStateSelected'] =''
+        request.session['teamConferenceSelected'] =''
+        request.session['teamDivisionSelected'] =''
+        request.session['teamNameSelected'] =''
+
         return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
     elif request.method == 'POST':
         
         q_object = Q()  
-        #if request.POST['team_filters']:
-        #if request.POST.get('team_filters', False):
+
         if (request.POST.get('team_filters', False) or (request.POST.get('select_team', False))):
             #Build value list for representation in displayed user form
             # If the value is 'None' send the entire list back otherwise
@@ -301,21 +272,50 @@ def queryteam(request):
                  )
                 form.choiceTeamState = forms.ChoiceField(choices = stateasDict)
                 q_object.add(Q(state = request.POST['teamState']),Q.AND)
-                request.session['teamState'] = request.POST['teamState']
+
+                #now store off session information for later lookups
+                request.session['teamStateDict'] = stateasDict
+                request.session['teamStateSelected'] = request.POST['teamState']
+            else:
+                request.session['teamState'] =''
+                #del request.session['teamState']
+                #request.session.modified = True
 
             if (request.POST['teamConference'] != 'Any'):
-                #tempList = request.POST['teamConference']
-                #tempList.sort()
                 confasDict =(
                     (request.POST['teamConference']),
                     ("Any"),
                  )
-                form.choiceFormConf = forms.ChoiceField(choices = confasDict)
+                form.choiceTeamConf = forms.ChoiceField(choices = confasDict)
                 q_object.add(Q(conference = request.POST['teamConference']),Q.AND)
-                request.session['teamConference'] = request.POST['teamConference']
+                #request.session['teamConference'] = request.POST['teamConference']
 
+                #now store off session information for later lookups
+                request.session['teamConferenceDict'] = confasDict
+                request.session['teamConferenceSelected'] = request.POST['teamConference']
+            else:
+                request.session['teamConference'] =''
+                #del request.session['teamConference']
+                #request.session.modified = True
+
+            if (request.POST['teamDivision'] != 'Any'):
+                divisionsasDict =(
+                    (request.POST['teamDivision']),
+                    ("Any"),
+                 )
+                form.choiceTeamDivision = forms.ChoiceField(choices = divisionsasDict)
+                q_object.add(Q(division = request.POST['teamDivision']),Q.AND)
+                
+                #now store off session information for later lookups
+                request.session['teamDivisionDict'] = divisionsasDict
+                request.session['teamDivisionSelected'] = request.POST['teamDivision']
+            else:
+                request.session['teamDivision'] =''
+                #del request.session['teamDivision']
+                #request.session.modified = True
 
             team_list = TeamData.objects.filter(q_object)
+
             #build the team list for display
             teamnamesasList = []
             if team_list.count() > 0:
@@ -327,21 +327,104 @@ def queryteam(request):
             
             
         if request.POST.get('select_team', False):
-            #if request.POST['select_team']:
-            # lookup team and display team data
-            #team2 = TeamData.objects.get(name = 'Team2')
-            #team_filter = TeamData.objects.filter(name = 'Team3')
-            #coach2=team2.name
-            teamObject = TeamData.objects.get(name = (request.POST['dropTeamName']))
+            # This means that a team has been selected from the dropdown list
+            # and that information needs to be displayed
+            # there a separate parts for display
+            # - The general team info
+            # - The team schedule
+            # - the current ranking of the team  by division, region, state
+
+            # To get here we need to have been given a team name so use the existing q list 
+            # to select the entry
+            q_object = Q() 
+            q_object.add(Q(name = request.POST['dropTeamName']),Q.AND)
+
+            #team_list = TeamData.objects.filter(q_object)
+            try:
+                teamObject = TeamData.objects.get(q_object)
+            except:
+               # this happens when the selection criteria allows multiple hits in the database
+               # send a response to the user that this occured and to narrow criteria
+               # TODO: THIS
+               # TODO maybe return back all options
+
+               #lets fill out a teamObject with data defining what happened
+               teamObject.name = "Search Failed! -  Multiple Entries Found for " + request.POST['dropTeamName'] +" Use additional filters to narrow search"
+               #raise ValueError(" Need more specific filters added - No specific team was found")
             
             #TODO: NEED to verify that this is a unique entry
 
-            request.session['dropTeamName'] = request.POST['dropTeamName']
+            #request.session['dropTeamName'] = request.POST['dropTeamName']
+            request.session['teamNameSelected'] = request.POST['dropTeamName']
+            # we found a team that matches search criteria, setup
+            # object return values so that new options can be rendered on the 
+            # return screen and provide a means to interact with it
+            # the idea here is to set return values for buttons and the
+            # functions available will vary according to the type of user
+            # general/manager/curator/etc
+            form.renderButtons = True
                 
             return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
 
+        if request.POST.get('team_actions', False):
+            #  This section deals with the management of team info display
+            # functions based around the buttons that return
+            # name="team_actions" value="listSchedule"  for example
+            gamedatalist = []
+            q_object=Q()
+            if request.POST['team_actions'] == 'listSchedule':
+                # Build a Q object with all of the data that has been captured thus far
+                q_object.add(Q(Away_team__name = request.session['teamNameSelected']),Q.OR)
+                q_object.add(Q(Home_team__name = request.session['teamNameSelected']),Q.OR)
+                games_set = GameInfo.objects.filter(q_object)
+                #games_set = GameInfo.objects.filter(Away_team__name = request.session['dropTeamName'])| GameInfo.objects.filter(Home_team__name = request.session['dropTeamName'])
+                #gamedatalist = []
 
-    return render(request,'app/team/teamquery.html' , {'form':form } )
+
+            for i in games_set:
+                tempGameRecord = GameRecord()
+                tempGameRecord.awayteamname=i.Away_team.name
+                tempGameRecord.awayscore=i.away_score
+                tempGameRecord.hometeamname=i.Home_team.name
+                tempGameRecord.homescore=i.home_score
+                tempGameRecord.gamedate = str(i.date)
+
+                if i.game_validated:
+                    tempGameRecord.verified='Score Validated'
+                else:
+                    tempGameRecord.verified='Unverified'
+
+                # now add a flag so that background for games can be colored in html side
+                # first figure out who won or lost
+                winner = ''
+                if (i.away_score < i.home_score):
+                    winner = tempGameRecord.hometeamname
+                else:
+                    winner = tempGameRecord.awayteamname
+
+                tempGameRecord.bgColor='ffffff'
+                if (winner==request.session['dropTeamName']):
+                    # set the back ground color to green
+                    tempGameRecord.bgColor='33cc3c'
+                    
+                gamedatalist.append(tempGameRecord)
+
+            #form.choiceTeamDivision = request.session['teamDivision'] 
+            form.choiceTeamDivision = forms.ChoiceField(choices = (request.session['teamDivisionDict']))
+            form.choiceTeamState = forms.ChoiceField(choices = (request.session['teamStateDict']))
+            form.choiceTeamConf = forms.ChoiceField(choices = (request.session['teamConferenceDict']))
+
+            q_object = Q()
+            q_object.add(Q(name = request.session['teamNameSelected']),Q.AND)
+            if request.session['teamDivisionSelected'] != '':
+                q_object.add(Q(division = request.session['teamDivisionSelected']),Q.AND)
+            teamObject = TeamData.objects.get(q_object)
+
+            #Turn the buttons back on
+            form.renderButtons = True
+
+            return render(request,'app/team/teamquery.html' , {'form':form,  'schedule': 'YES', 'games': gamedatalist, 'teamInfo': teamObject } )
+        return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
 
 def logout_view(request):
     logout(request)
@@ -350,3 +433,6 @@ def logout_view(request):
 def login_view(request):
     login(request)
     return render(request, 'app/login.html')
+
+def calculate_win_loss(teamObj):
+    #this function will run through the calculations to determine a teams win loss record

@@ -28,8 +28,8 @@ urlpatterns = [
     # Examples:
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-    path('admin', admin.site.urls),
-    path('teamquery', app.views.queryteam),
+    #path('teamquery', app.views.queryteam),
+    path('admin', admin.site.urls), 
     path('accounts/', include('django.contrib.auth.urls')), 
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
@@ -44,6 +44,7 @@ urlpatterns = [
     url('failregister',app.views.failregistration),
     url(r'^logout$', app.views.logout_view, name='home'),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),   
+    url(r'^teamquery$', app.views.queryteam,  name='teamquery'),
 ]
  
    

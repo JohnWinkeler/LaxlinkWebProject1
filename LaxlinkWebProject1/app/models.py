@@ -98,15 +98,6 @@ class WinLossRecord(models.Model):
     def __str__(self):
         return str(self.id)
 
-#class User(models.Model):
-#   user_name: models.CharField(max_length = 20)
-#    is_score_keeper = models.BooleanField(default=False)
-#    first_name = models.CharField(max_length =20)
-#    last_name = models.CharField(max_length = 20)
-#    email_address = models.EmailField(default="unknown")
-#    score_accuracy = models.IntegerField()
-
-
 class GameInfo(models.Model): 
     #TODO: Add field for the individuals who validated score 2-3 mapping to a USER
 
@@ -136,41 +127,7 @@ class GameInfo(models.Model):
     #    return self.away_team.__str__ + "at" + self.home_team.__str__
         return str(self.id)
     
-#class UserProfile(models.Model):
-#    ROLE_CHOICES = (
-#        ('CURATOR','Curator'),
-#        ('REGIONAL_MANAGER','Regional Manager'),
-#        ('TEAM_MANAGER', 'Team Manager'),
-#        ('GENERAL_USER', 'General User')
-#        )
-#    role = models.CharField(max_length=20, 
-#                            choices=ROLE_CHOICES, 
-#                            default='GENERAL_USER')
 
-#    user = models.OneToOneField(User, 
-#                                on_delete=models.CASCADE,
-#                                blank=True, 
-#                                null=True, 
-#                                unique=True)
-
-#    favState = models.CharField(max_length=2, 
-#                                choices=STATES, 
-#                                default="Any")
-
-#    favDivision = models.CharField(max_length=6, 
-#                                   choices=DIVISIONS, 
-#                                   default="Any")
-
-#    def __str__(self):
-#        return self.user.username
-    
-#    def __cleaned_data__(self):
-#        return True
-
-#@receiver(post_save, sender=User)
-#def create_or_update_user_profile(sender, instance, created, **kwargs):
-#    if created:
-#        UserProfile.objects.create(user=instance)
 
 class Profile(models.Model):
     ROLE_CHOICES = (

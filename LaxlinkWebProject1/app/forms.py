@@ -52,31 +52,7 @@ class RegistrationForm(UserCreationForm):
 
         return user
 
-#class ProfileForm(forms.ModelForm):
-#    class Meta:
-#        model = UserProfile
-#        #fields = ('role', 
-#        #          'user', 
-#        #          'favState',
-#        #          'favDivision')
-#        fields = ('user',) 
 
-##    def save(self, commit=True):
-##        profile=super(ProfileForm, self).save(commit=False)
-##        if commit:
-##            profile.save()
-##         
-##        return profile
-    
-
-#@receiver(post_save, sender=User)
-#def create_user_profile(sender, instance, created, **kwargs):
-#    if created:
-#        ProfileForm.objects.create(user=instance)
-
-#@receiver(post_save, sender=User)
-#def save_user_profile(sender, instance, **kwargs):
-#    instance.ProfileForm.save()
 
 class CreateTeamInfoForm(forms.ModelForm):
     
@@ -128,12 +104,18 @@ class QueryTeamInfoForm(forms.Form):
                     "name" : "",
                     "division": ""}
     widget = dict()
+    renderScheduleButton = bool
+    renderRankingButton = bool
+
 
     def __str__(self):
         return str(self.dbteamNames + self.dbDivisions + self.dbTeamState + self.dbConferences )
 
     def __init__(self, *args, **kwargs):
         # Appears need to call super to init properly to get fields
+        renderScheduleButton = False
+        renderRankingButton = False
+
         super(QueryTeamInfoForm, self).__init__(*args, **kwargs)
         team_set = TeamData.objects.all()
 
@@ -149,14 +131,17 @@ class QueryTeamInfoForm(forms.Form):
 
         asDict = {k: v for v, k in enumerate(self.dbConferences)}
         namesasDict = {k: v for v, k in enumerate(self.dbteamNames)}
+        divisionsasDict = {k: v for v, k in enumerate(self.dbDivisions)}
         stateasDict = {k: v for v, k in enumerate(self.dbTeamState)}
         confasDict  = {k: v for v, k in enumerate(self.dbConferences)}
 
-        self.widget=forms.Select(choices=asDict)
-        self.choiceFormConf=forms.ChoiceField(choices = asDict)
+        #self.widget = forms.Select(choices=asDict)
+        self.choiceFormConf = forms.ChoiceField(choices = asDict)
         self.choiceTeamNames = forms.ChoiceField(choices = namesasDict)
         self.choiceTeamState = forms.ChoiceField(choices = stateasDict)
         self.choiceTeamConf = forms.ChoiceField(choices = confasDict)
+        self.choiceTeamDivision = forms.ChoiceField(choices = divisionsasDict)
+        #self.choiceTeamDivision = forms.ChoiceField(choices = divisionsasDict)
 
 
      

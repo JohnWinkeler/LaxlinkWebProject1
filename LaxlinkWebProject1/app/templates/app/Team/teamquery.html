@@ -7,47 +7,98 @@
 
 {% block content %}
 
-<div class="fieldWrapper">
-    <h3> Team State</h3>
-    <form method="post">
-        <select name="teamState">
-            {% for state in form.choiceTeamState.choices %}
 
-            <option value="{{ state }}">{{ state }}</option>
 
-            {% endfor %}
-        </select>
-        <h3> Team Conference</h3>
-        <select name="teamConference">
-            {% for conf in form.choiceFormConf.choices %}
-
-            <option value="{{ conf }}">{{ conf }}</option>
-
-            {% endfor %}
-        </select>
-
+<div class="row">
+    <div class="col-md-3">
+        <div class="demo-content bg-alt">Search Filters
+        <form method="post">
         {% csrf_token %}
-        <button type="submit" name="team_filters" value="team_filters">Apply Filters</button>
+            <h4> Team State</h4>
+            <select name="teamState">
+                {% for state in form.choiceTeamState.choices %}
+                    <option value="{{ state }}">{{ state }}</option>
+                {% endfor %}
+            </select>
 
-         <h3> Teams Tracked </h3>
-   
-        <select name="dropTeamName">
-            {% for teamName in form.choiceTeamNames.choices %}
+            <h4> Team Conference</h4>
+            <select name="teamConference">
+                {% for conf in form.choiceTeamConf.choices %}
+                    <option value="{{ conf }}">{{ conf }}</option>
+                {% endfor %}
+            </select>
+            <h4> Team Division</h4>
+            <select name="teamDivision">
+                {% for division in form.choiceTeamDivision.choices %}
+                    <option value="{{ division }}">{{ division }}</option>
+                {% endfor %}
+            </select>
+        <button type="submit" class="btn btn-primary btn-sm" name="team_filters" value="team_filters">Apply Filters</button>
 
-            <option value="{{ teamName }}">{{ teamName }}</option>
+        <h3>Available Teams</h3>
+            <select name="dropTeamName">
+                {% for teamName in form.choiceTeamNames.choices %}
+                    <option value="{{ teamName }}">{{ teamName }}</option>
+                {% endfor %}
+            </select>
+        <button type="submit" class="btn btn-primary btn-sm btn-block" name="select_team" value="select_team">Select Team</button>
 
-            {% endfor %}
-        </select>
+        </div>
 
-
-        <button type="submit" name="select_team" value="select_team">Select Team</button>
-
-
-    </form>
+        
+        </form>
+    </div>
+    <div class="col-md-3">
+        <div class="demo-content bg-alt">Team Info
+        <form method="post">
+            {% csrf_token %}
+     
+            <H2>{{ teamInfo.name }}</H2>
+            <h4>Team Home State - {{ teamInfo.state}}</h4> 
+            
+            <h4>Team Division - {{ teamInfo.division }} </h4>
+            <h4>Conference -  {{teamInfo.conference}} </h4> 
+          
+            <h4>Coach - {{teamInfo.coach}} </h4> 
+            
+            <h4>Power Rating - {{teamInfo.powerrating}}</h4> 
+            
+            {% if form.renderButtons %}
+            <div class="btn-group-vertical btn-group-md btn-block" role="group" aria-label="teamAction">
+                <button type="submit" class="btn btn-primary" name="team_actions" value="listSchedule">Schedule</button>
+                <button type="submit" class="btn btn-secondary" name="team_actions" value="listLeagueRanking">League Ranking</button>
+                <button type="submit" class="btn btn-primary" name="team_actions" value="listStateRanking">State Ranking</button>
+            </div>
+            {% endif %}
+        </form>
+        </div>
+    </div>
+    <div class="col-md-6">
+       
+        {% if schedule %}
+        <div class="demo-content">Schedule
+            <table style="width:100%">
+                <tr>
+                    <th bgcolor="#c9d8f2">Away Team</th>
+                    <th bgcolor="#c9d8f2">Home Team</th>
+                    <th bgcolor="#c9d8f2">Date</th>
+                </tr>
+                {% for game in games %}
+                    <tr bgcolor={{game.bgColor}}>
+                        <td> {{ game.awayteamname }} </td>
+                        <td> {{ game.hometeamname }} </td>
+                        <td> {{ game.gamedate }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 
-<div class="fieldWrapper">
+
+<div class="container">
     <h3> Desired Team </h3>
     <form method="post">
         {% csrf_token %}
@@ -64,9 +115,19 @@
         {{teamInfo.coach}}
         <label>Power Rating</label> 
         {{teamInfo.powerrating}}
+        {% if form.renderRankingButton %}
+            <h1> RANKING BUTTON ENABLED</h1>
+        {% endif %}
 
+        {% if form.renderScheduleButton %}
+            <h1> Scheduling BUTTON ENABLED</h1>
+        {% endif %}
     </form>
 </div>
+
+
+    
+
 {% endblock %}
 
 
