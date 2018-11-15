@@ -79,17 +79,31 @@
         <div class="demo-content">Schedule
             <table style="width:100%">
                 <tr>
-                    <th bgcolor="#c9d8f2">Away Team</th>
-                    <th bgcolor="#c9d8f2">Home Team</th>
+                    <th bgcolor="#c9d8f2">Away</th>
+                    <th bgcolor="#c9d8f2">Score</th>
+                    <th bgcolor="#c9d8f2">Home</th>
+                    <th bgcolor="#c9d8f2">Score</th>
                     <th bgcolor="#c9d8f2">Date</th>
+                    <th bgcolor="#c9d8f2">Verified</th>
                 </tr>
                 {% for game in games %}
                     <tr bgcolor={{game.bgColor}}>
                         <td> {{ game.awayteamname }} </td>
+                        <td> {{ game.awayscore }} </td>
                         <td> {{ game.hometeamname }} </td>
+                        <td> {{ game.homescore }} </td>
                         <td> {{ game.gamedate }} </td>
+                        <td> {{ game.verified }} </td>
                     </tr>
                 {% endfor %}
+            </table>
+            <table style="width:40%">
+                <tr bgcolor="#D3D3D3">
+                    <td>Season Record </td>
+                    <td> {{wins}} </td>
+                    <td>:</td>
+                    <td> {{losses}} </td>
+                </tr>
             </table>
         </div>
         {% endif %}

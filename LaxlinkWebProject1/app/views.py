@@ -278,6 +278,7 @@ def queryteam(request):
                 request.session['teamStateSelected'] = request.POST['teamState']
             else:
                 request.session['teamState'] =''
+                request.session['teamStateSelected'] =''
                 #del request.session['teamState']
                 #request.session.modified = True
 
@@ -295,6 +296,7 @@ def queryteam(request):
                 request.session['teamConferenceSelected'] = request.POST['teamConference']
             else:
                 request.session['teamConference'] =''
+                request.session['teamConferenceSelected'] =''
                 #del request.session['teamConference']
                 #request.session.modified = True
 
@@ -311,6 +313,7 @@ def queryteam(request):
                 request.session['teamDivisionSelected'] = request.POST['teamDivision']
             else:
                 request.session['teamDivision'] =''
+                request.session['teamDivisionSelected'] =''
                 #del request.session['teamDivision']
                 #request.session.modified = True
 
@@ -334,14 +337,25 @@ def queryteam(request):
             # - The team schedule
             # - the current ranking of the team  by division, region, state
 
-            # To get here we need to have been given a team name so use the existing q list 
-            # to select the entry
-            q_object = Q() 
+            # Disable form buttons in case of error processing
+            form.renderButtons = False
+
+            # To get here we need to have been given a team name so build a q list 
+            # of saved of values to select the entry
+            
+            q_object = Q()
+            if request.session['teamDivisionSelected'] != '':
+                q_object.add(Q(division = request.session['teamDivisionSelected']),Q.AND)
+            if request.session['teamConferenceSelected'] != '':
+                q_object.add(Q(conference = request.session['teamConferenceSelected']),Q.AND)
+            if request.session['teamStateSelected'] != '':
+                q_object.add(Q(state = request.session['teamStateSelected']),Q.AND)
             q_object.add(Q(name = request.POST['dropTeamName']),Q.AND)
 
             #team_list = TeamData.objects.filter(q_object)
             try:
                 teamObject = TeamData.objects.get(q_object)
+                form.renderButtons = True
             except:
                # this happens when the selection criteria allows multiple hits in the database
                # send a response to the user that this occured and to narrow criteria
@@ -362,7 +376,7 @@ def queryteam(request):
             # the idea here is to set return values for buttons and the
             # functions available will vary according to the type of user
             # general/manager/curator/etc
-            form.renderButtons = True
+            #form.renderButtons = True
                 
             return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
 
@@ -372,14 +386,13 @@ def queryteam(request):
             # name="team_actions" value="listSchedule"  for example
             gamedatalist = []
             q_object=Q()
+            wins=0
             if request.POST['team_actions'] == 'listSchedule':
                 # Build a Q object with all of the data that has been captured thus far
                 q_object.add(Q(Away_team__name = request.session['teamNameSelected']),Q.OR)
                 q_object.add(Q(Home_team__name = request.session['teamNameSelected']),Q.OR)
+#TODO: Add to query to only take current season or selected season into account
                 games_set = GameInfo.objects.filter(q_object)
-                #games_set = GameInfo.objects.filter(Away_team__name = request.session['dropTeamName'])| GameInfo.objects.filter(Home_team__name = request.session['dropTeamName'])
-                #gamedatalist = []
-
 
             for i in games_set:
                 tempGameRecord = GameRecord()
@@ -390,9 +403,9 @@ def queryteam(request):
                 tempGameRecord.gamedate = str(i.date)
 
                 if i.game_validated:
-                    tempGameRecord.verified='Score Validated'
+                    tempGameRecord.verified='V'
                 else:
-                    tempGameRecord.verified='Unverified'
+                    tempGameRecord.verified='-'
 
                 # now add a flag so that background for games can be colored in html side
                 # first figure out who won or lost
@@ -403,9 +416,10 @@ def queryteam(request):
                     winner = tempGameRecord.awayteamname
 
                 tempGameRecord.bgColor='ffffff'
-                if (winner==request.session['dropTeamName']):
+                if (winner==request.session['teamNameSelected']):
                     # set the back ground color to green
                     tempGameRecord.bgColor='33cc3c'
+                    wins = wins+1
                     
                 gamedatalist.append(tempGameRecord)
 
@@ -422,8 +436,15 @@ def queryteam(request):
 
             #Turn the buttons back on
             form.renderButtons = True
+            losses = ((games_set.count())-wins)
+            
 
-            return render(request,'app/team/teamquery.html' , {'form':form,  'schedule': 'YES', 'games': gamedatalist, 'teamInfo': teamObject } )
+            return render(request,'app/team/teamquery.html' , {'form':form, 
+                                                               'schedule': 'YES', 
+                                                               'games': gamedatalist, 
+                                                               'teamInfo': teamObject, 
+                                                               'wins': wins,
+                                                               'losses': losses} )
         return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
 
 def logout_view(request):
