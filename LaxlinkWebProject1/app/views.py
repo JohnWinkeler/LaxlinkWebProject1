@@ -434,5 +434,3 @@ def login_view(request):
     login(request)
     return render(request, 'app/login.html')
 
-def calculate_win_loss(teamObj):
-    #this function will run through the calculations to determine a teams win loss record
