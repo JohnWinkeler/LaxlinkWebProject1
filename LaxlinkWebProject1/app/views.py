@@ -56,10 +56,41 @@ class GameRecord:
     hometeamname=''
     awayteamname=''
     gamedate=''
-    verified=''
+    verified='-'
     homescore=''
     awayscore=''
     bgColor=''
+
+    def __init_(self):
+        hometeamname='home'
+        awayteamname='away'
+        gamedate='date'
+        verified='-'
+        homescore='-'
+        awayscore='-'
+        bgColor=''
+
+
+class RankRecord:
+    teamname=''
+    wincount=0
+    losscount=0
+    tiecount=0
+    gamesbehind=0
+    teamrating=0
+    # used to calculate straight up rankings based on 
+    # win loss and games behind
+    winvalue=2
+    losevalue=0
+    gamesbehindvalue=1
+    def __init__(self):
+        teamname=''
+        wincount=0
+        losscount=0
+        tiecount=0
+        gamesbehind=0
+        teamrating=0
+
 
 def WebPage1(request):
     """Renders the WebPage1 page."""
@@ -355,6 +386,7 @@ def queryteam(request):
             #team_list = TeamData.objects.filter(q_object)
             try:
                 teamObject = TeamData.objects.get(q_object)
+                #session.teamobject = teamObject
                 form.renderButtons = True
             except:
                # this happens when the selection criteria allows multiple hits in the database
@@ -394,57 +426,82 @@ def queryteam(request):
 #TODO: Add to query to only take current season or selected season into account
                 games_set = GameInfo.objects.filter(q_object)
 
-            for i in games_set:
-                tempGameRecord = GameRecord()
-                tempGameRecord.awayteamname=i.Away_team.name
-                tempGameRecord.awayscore=i.away_score
-                tempGameRecord.hometeamname=i.Home_team.name
-                tempGameRecord.homescore=i.home_score
-                tempGameRecord.gamedate = str(i.date)
+                for i in games_set:
+                    tempGameRecord = GameRecord()
+                    tempGameRecord.awayteamname=i.Away_team.name
+                    tempGameRecord.awayscore=i.away_score
+                    tempGameRecord.hometeamname=i.Home_team.name
+                    tempGameRecord.homescore=i.home_score
+                    tempGameRecord.gamedate = str(i.date)
 
-                if i.game_validated:
-                    tempGameRecord.verified='V'
-                else:
-                    tempGameRecord.verified='-'
+                    if i.game_validated:
+                        tempGameRecord.verified='V'
+                    else:
+                        tempGameRecord.verified='-'
 
-                # now add a flag so that background for games can be colored in html side
-                # first figure out who won or lost
-                winner = ''
-                if (i.away_score < i.home_score):
-                    winner = tempGameRecord.hometeamname
-                else:
-                    winner = tempGameRecord.awayteamname
+                    # now add a flag so that background for games can be colored in html side
+                    # first figure out who won or lost
+                    winner = ''
+                    if (i.away_score < i.home_score):
+                        winner = tempGameRecord.hometeamname
+                    else:
+                        winner = tempGameRecord.awayteamname
 
-                tempGameRecord.bgColor='ffffff'
-                if (winner==request.session['teamNameSelected']):
-                    # set the back ground color to green
-                    tempGameRecord.bgColor='33cc3c'
-                    wins = wins+1
+                    tempGameRecord.bgColor='ffffff'
+                    if (winner==request.session['teamNameSelected']):
+                        # set the back ground color to green
+                        tempGameRecord.bgColor='33cc3c'
+                        wins = wins+1
                     
-                gamedatalist.append(tempGameRecord)
+                    gamedatalist.append(tempGameRecord)
 
-            #form.choiceTeamDivision = request.session['teamDivision'] 
-            form.choiceTeamDivision = forms.ChoiceField(choices = (request.session['teamDivisionDict']))
-            form.choiceTeamState = forms.ChoiceField(choices = (request.session['teamStateDict']))
-            form.choiceTeamConf = forms.ChoiceField(choices = (request.session['teamConferenceDict']))
+                #form.choiceTeamDivision = request.session['teamDivision'] 
+                form.choiceTeamDivision = forms.ChoiceField(choices = (request.session['teamDivisionDict']))
+                form.choiceTeamState = forms.ChoiceField(choices = (request.session['teamStateDict']))
+                form.choiceTeamConf = forms.ChoiceField(choices = (request.session['teamConferenceDict']))
 
-            q_object = Q()
-            q_object.add(Q(name = request.session['teamNameSelected']),Q.AND)
-            if request.session['teamDivisionSelected'] != '':
-                q_object.add(Q(division = request.session['teamDivisionSelected']),Q.AND)
-            teamObject = TeamData.objects.get(q_object)
+                q_object = Q()
+                q_object.add(Q(name = request.session['teamNameSelected']),Q.AND)
+                if request.session['teamDivisionSelected'] != '':
+                    q_object.add(Q(division = request.session['teamDivisionSelected']),Q.AND)
+                if request.session['teamConferenceSelected'] != '':
+                    q_object.add(Q(conference = request.session['teamConferenceSelected']),Q.AND)
+                if request.session['teamStateSelected'] != '':
+                    q_object.add(Q(state = request.session['teamStateSelected']),Q.AND)
+              
+                teamObject = TeamData.objects.get(q_object)
 
-            #Turn the buttons back on
-            form.renderButtons = True
-            losses = ((games_set.count())-wins)
+                #Turn the buttons back on
+                form.renderButtons = True
+                losses = ((games_set.count())-wins)
             
 
-            return render(request,'app/team/teamquery.html' , {'form':form, 
+                return render(request,'app/team/teamquery.html' , {'form':form, 
                                                                'schedule': 'YES', 
                                                                'games': gamedatalist, 
                                                                'teamInfo': teamObject, 
                                                                'wins': wins,
                                                                'losses': losses} )
+            
+            if request.POST['team_actions'] == 'listLeagueRanking':
+                rankdatalist = []
+                rankdatalist = RankTeams(request)
+                form.renderButtons = True
+                q_object = Q()
+                if request.session['teamDivisionSelected'] != '':
+                    q_object.add(Q(division = request.session['teamDivisionSelected']),Q.AND)
+                if request.session['teamConferenceSelected'] != '':
+                    q_object.add(Q(conference = request.session['teamConferenceSelected']),Q.AND)
+                if request.session['teamStateSelected'] != '':
+                    q_object.add(Q(state = request.session['teamStateSelected']),Q.AND)
+                q_object.add(Q(name = request.session['teamNameSelected']),Q.AND)
+                teamObject = TeamData.objects.get(q_object)
+
+                return render(request,'app/team/teamquery.html' , {'form':form, 
+                                                                   'teamInfo': teamObject, 
+                                                                   'rankedlist': rankdatalist,
+                                                                   'basicranking': 'YES'} )
+
         return render(request,'app/team/teamquery.html' , {'form':form, 'teamInfo': teamObject} )
 
 def logout_view(request):
@@ -454,4 +511,100 @@ def logout_view(request):
 def login_view(request):
     login(request)
     return render(request, 'app/login.html')
+
+def RankTeams(request):
+    # This is used to build a list of all teams sorted by wins
+    # this will handle the sorting determined by session info and
+    # will return a list of games
+
+
+    # Build a Q object with all of the data that can be inferred from the request
+    # and the selected team
+    # what we should be able to know
+    # The conference the team is in
+    # The league that the team is in
+    # these values will be used to find all teams that have the same values
+    # to determine the league ranking
+    q_object = Q()
+    team_filter_object = Q()
+    if request.session['teamDivisionSelected'] != '':
+        q_object.add(Q(Away_team__division = request.session['teamDivisionSelected']),Q.AND)
+        q_object.add(Q(Home_team__division = request.session['teamDivisionSelected']),Q.AND)
+        team_filter_object.add(Q(division = request.session['teamDivisionSelected']),Q.AND)
+
+    if request.session['teamConferenceSelected'] != '':
+        q_object.add(Q(Away_team__conference = request.session['teamConferenceSelected']),Q.AND)
+        q_object.add(Q(Home_team__conference = request.session['teamConferenceSelected']),Q.AND)
+        team_filter_object.add(Q(conference = request.session['teamConferenceSelected']),Q.AND)
+
+#TODO: Add to query to only take current season or selected season into account
+    games_set = GameInfo.objects.filter(q_object)
+    teams_set = TeamData.objects.filter(team_filter_object)
+
+    rankdatalist = []
+    
+    #First make a list of all teams in league 
+    for team in teams_set:
+        teamranknode = RankRecord()
+        teamranknode.name = team.name
+        #teamranknode.wincount = 0
+        #teamranknode.losscount = 0
+        #teamranknode.tiecount = 0
+        rankdatalist.append(teamranknode)
+
+    # now go through the game list and start marking wins and losses
+    # in teamranknode
+    for game in games_set:
+## TODO: make this work for only verified scores
+        #if i.game_validated:
+        #    tempGameRecord.verified='V'
+        #else:
+        #    tempGameRecord.verified='-'
+        tempGameRecord = GameRecord()
+        tempGameRecord.awayteamname=game.Away_team.name
+        tempGameRecord.awayscore=game.away_score
+        tempGameRecord.hometeamname=game.Home_team.name
+        tempGameRecord.homescore=game.home_score
+
+        # first figure out who won or lost so that the counts can be tallied
+        # in the followup loop through teams in league
+        winner = ''
+        loser = ''
+        if (game.away_score < game.home_score):
+            winner = tempGameRecord.hometeamname
+            loser = tempGameRecord.awayteamname
+        else:
+            winner = tempGameRecord.awayteamname
+            loser = tempGameRecord.hometeamname
+
+        for team in rankdatalist:
+            if team.name == winner:
+                team.wincount += 1
+            if team.name == loser:
+                team.losscount +=1
+        
+
+    #Teamranklist contains a list of all teams in league and their wins and losses
+    # tallied. Now we need to figure out:
+    # Maximum number of games played
+    # then calculate and populate the number of games behind
+    highnumgames=0
+    for eachteam in rankdatalist:
+        gamesteamplayed = eachteam.wincount + eachteam.losscount + eachteam.tiecount
+        if gamesteamplayed > highnumgames:
+            highnumgames = gamesteamplayed
+
+    #Now populate the games behind field and calculate the teamrating
+    for eachteam in rankdatalist:
+        eachteam.gamesbehind = highnumgames-eachteam.losscount-eachteam.wincount-eachteam.tiecount
+        eachteam.teamrating = ((eachteam.gamesbehind*eachteam.gamesbehindvalue)+
+                               (eachteam.wincount*eachteam.winvalue)+
+                               (eachteam.losscount*eachteam.losevalue))
+
+
+    rankdatalist.sort(key=lambda RankRecord: RankRecord.teamrating, reverse=True)    
+
+
+    ## Figure out the return value
+    return rankdatalist
 

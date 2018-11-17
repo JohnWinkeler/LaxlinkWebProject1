@@ -107,38 +107,30 @@
             </table>
         </div>
         {% endif %}
+        {% if basicranking %}
+        <div class="demo-content">Rank
+            <table style="width:100%">
+                <tr bgcolor=#D3D3D3>
+                    <th bgcolor="#c9d8f2">Team Name</th>
+                    <th bgcolor="#c9d8f2">Wins</th>
+                    <th bgcolor="#c9d8f2">Loss</th>
+                    <th bgcolor="#c9d8f2">Ties</th>
+                    <th bgcolor="#c9d8f2">GB</th>
+                </tr>
+                {% for team in rankedlist %}
+                <tr bgcolor=#D3D3D3>
+                    <td> {{ team.name }} </td>
+                    <td> {{ team.wincount }} </td>
+                    <td> {{ team.losscount }} </td>
+                    <td> {{ team.tiecount }} </td>
+                    <td> {{ team.gamesbehind }} </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
     </div>
 </div>
-
-
-
-<div class="container">
-    <h3> Desired Team </h3>
-    <form method="post">
-        {% csrf_token %}
-        
-        <label>Team Name:</label>
-        <H2>{{ teamInfo.name }}</H2>
-        <label>Team Home State</label> 
-        {{ teamInfo.state}}
-        <label>Team Division</label> 
-        {{ teamInfo.division }}
-        <label>Conference</label> 
-        {{teamInfo.conference}}
-        <label>Coach</label> 
-        {{teamInfo.coach}}
-        <label>Power Rating</label> 
-        {{teamInfo.powerrating}}
-        {% if form.renderRankingButton %}
-            <h1> RANKING BUTTON ENABLED</h1>
-        {% endif %}
-
-        {% if form.renderScheduleButton %}
-            <h1> Scheduling BUTTON ENABLED</h1>
-        {% endif %}
-    </form>
-</div>
-
 
     
 
